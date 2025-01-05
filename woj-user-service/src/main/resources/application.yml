@@ -1,0 +1,26 @@
+spring:
+  profiles:
+    active: dev
+  application:
+    name: woj-user-service
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+
+server:
+  servlet:
+    context-path: /api/user
+    session:
+      cookie:
+        max-age: 2592000
+        path: "/api"
+logging:
+  pattern:
+    dateformat: yyyy-MM-dd HH:mm:ss:SSS
+emailUtil:
+  hostName: smtp.qq.com
+  charset: UTF-8
+  account: 3153917921@qq.com
+  password: unijbjmgvfspdddb
+  name: AcKing

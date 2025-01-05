@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chuan.wojwebservice.mapper.ActivityMapper">
+
+    <resultMap id="BaseResultMap" type="com.chuan.wojmodel.pojo.entity.Activity">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="title" column="title" jdbcType="VARCHAR"/>
+            <result property="description" column="description" jdbcType="VARCHAR"/>
+            <result property="avatar" column="avatar" jdbcType="VARCHAR"/>
+            <result property="createtime" column="createTime" jdbcType="TIMESTAMP"/>
+            <result property="updatetime" column="updateTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,title,description,
+        avatar,createTime,updateTime
+    </sql>
+    <select id="selectActivityTitleList" resultType="com.chuan.wojmodel.pojo.vo.activity.ActivityTitleVO">
+        select id,title,avatar from `activity`;
+    </select>
+
+    <select id="selectActivityContentVO" resultType="com.chuan.wojmodel.pojo.vo.activity.ActivityContentVO">
+        select id,title,description,createTime from `activity` where `id`=#{id};
+    </select>
+</mapper>

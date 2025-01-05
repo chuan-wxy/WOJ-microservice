@@ -1,0 +1,28 @@
+spring:
+  profiles:
+    active: dev
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+
+  application:
+    name: woj-judge-service
+server:
+  servlet:
+    context-path: /api/judge
+    session:
+      cookie:
+        max-age: 2592000
+        path: "/api"
+
+logging:
+  pattern:
+    dateformat: yyyy-MM-dd HH:mm:ss:SSS
+
+emailUtil:
+  hostName: smtp.qq.com
+  charset: UTF-8
+  account: 3153917921@qq.com
+  password: unijbjmgvfspdddb
+  name: AcKing

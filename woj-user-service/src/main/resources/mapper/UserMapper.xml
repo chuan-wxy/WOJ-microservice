@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chuan.wojuserservice.mapper.UserMapper">
+
+    <resultMap id="BaseResultMap" type="com.chuan.wojmodel.pojo.entity.User">
+            <id property="uuid" column="uuid" jdbcType="VARCHAR"/>
+            <result property="unionid" column="unionId" jdbcType="VARCHAR"/>
+            <result property="mpopenid" column="mpOpenId" jdbcType="VARCHAR"/>
+            <result property="userAccount" column="userAccount" jdbcType="VARCHAR"/>
+            <result property="userPassword" column="userPassword" jdbcType="VARCHAR"/>
+            <result property="userName" column="userName" jdbcType="VARCHAR"/>
+            <result property="userProfile" column="userProfile" jdbcType="VARCHAR"/>
+            <result property="school" column="school" jdbcType="VARCHAR"/>
+            <result property="course" column="course" jdbcType="VARCHAR"/>
+            <result property="number" column="number" jdbcType="VARCHAR"/>
+            <result property="gender" column="gender" jdbcType="VARCHAR"/>
+            <result property="github" column="github" jdbcType="VARCHAR"/>
+            <result property="blog" column="blog" jdbcType="VARCHAR"/>
+            <result property="avatar" column="avatar" jdbcType="VARCHAR"/>
+            <result property="signature" column="signature" jdbcType="VARCHAR"/>
+            <result property="titleName" column="title_name" jdbcType="VARCHAR"/>
+            <result property="titleColor" column="title_color" jdbcType="VARCHAR"/>
+            <result property="status" column="status" jdbcType="INTEGER"/>
+            <result property="createTime" column="createTime" jdbcType="TIMESTAMP"/>
+            <result property="updateTime" column="updateTime" jdbcType="TIMESTAMP"/>
+            <result property="isDelete" column="isDelete" jdbcType="TINYINT"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        uuid,unionId,mpOpenId,
+        userAccount,password,userName,
+        userProfile,school,course,
+        number,gender,github,
+        blog,avatar,signature,
+        title_name,title_color,status,
+        createTime,updateTime,isDelete
+    </sql>
+</mapper>

@@ -1,0 +1,94 @@
+# redis配置
+redis-host: ${REDIS_HOST:127.0.0.1}
+redis-port: ${REDIS_PORT:6379}
+redis-password: ${REDIS_PASSWORD:root@123456}
+
+# mysql配置
+mysql-host: ${MYSQL_HOST:127.0.0.1}
+mysql-port: ${MYSQL_PORT:3306}
+mysql-username: ${MYSQL_USERNAME:root}
+mysql-password: ${MYSQL_PASSWORD:2W0x0y40706@}
+
+ssl-key-store-type: ${SSL_KEY_STORE_TYPE:jks}
+ssl-key-password: ${SSL_KEY_PASSWORD:21q06e25}
+ssl-key-store-path: ${SSL_KEY_STORE_PATH:/home/serve/resource/woj.asia.jks}
+
+# 日志输出目录
+logging-file-path: ${LOGGING_FILE_PATH:/home/serve/woj.log}
+
+submit-code-path: ${SUBMIT_CODE_PATH:/home/serve/submitcode}
+judgecase-path: ${JUDGECASE_PATH:/home/serve/judgecase}
+# 图像
+user-avatar-path: ${USER_AVATAR_PATH:/usr/local/nginx/html/avatar/user}
+course-avatar-path: ${COURSE_AVATAR_PATH:/usr/local/nginx/html/avatar/course}
+activity-avatar-path: ${ACTIVITY_AVATAR_PATH:/usr/local/nginx/html/avatar/activity}
+
+spring:
+  # 数据库配置
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/woj
+    username: ${mysql-username}
+    password: ${mysql-password}
+  data:
+    redis:
+      host: ${redis-host}
+      port: ${redis-port}
+      password: ${redis-password}
+      jedis:
+        pool:
+          min-idle: 10 #连接池中的最小空闲连接
+          max-idle: 50 #连接池中的最大空闲连接
+          max-active: 200 #连接池最大连接数（使用负值表示没有限制）
+          max-wait: 2000 #连接池最大阻塞等待时间（使用负值表示没有限制）
+
+server:
+  port: 8088
+  ssl:
+    key-store-type: ${ssl-key-store-type}
+    key-password: ${ssl-key-password}
+    key-store: ${ssl-key-store-path}
+
+  servlet:
+    context-path: /api
+
+mybatis-plus:
+  global-config:
+    db-config:
+      # 全局逻辑删除字段
+      logic-delete-field: isDelete
+      # 逻辑删除值
+      logic-delete-value: 1
+      # 逻辑未删除值
+      logic-not-delete-value: 0
+  configuration:
+    map-underscore-to-camel-case: false
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+knife4j:
+  enable: true
+  setting:
+    language: zh_cn
+  documents:
+      group: 2.X版本
+      name: 接口签名
+      locations: classpath:sign/*
+
+# spring 事务管理日志
+logging:
+  level:
+    org.springframework.jdbc.support.JdbcTransactionManager: debug
+  config: classpath:logback.xml
+
+#自定义代码代码沙箱的输出地址，默认为false，使用项目目录下的questionCode作为文件的输出地址，开启后将使用指定的地址
+path:
+  code:
+    submit-code-path: ${submit-code-path}
+    judgecase-path: ${judgecase-path}
+  avatar:
+    user-avatar-path: ${user-avatar-path}
+    course-avatar-path: ${course-avatar-path}
+    activity-avatar-path: ${activity-avatar-path}
+

@@ -1,0 +1,17 @@
+spring:
+  profiles:
+    active: dev
+
+  application:
+    name: woj-common
+logging:
+  pattern:
+    dateformat: yyyy-MM-dd HH:mm:ss:SSS
+
+
+emailUtil:
+  hostName: smtp.qq.com
+  charset: UTF-8
+  account: 3153917921@qq.com
+  password: unijbjmgvfspdddb
+  name: AcKing

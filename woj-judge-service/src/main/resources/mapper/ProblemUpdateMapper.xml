@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chuan.wojjudgeservice.mapper.ProblemUpdateMapper">
+
+    <resultMap id="BaseResultMap" type="com.chuan.wojmodel.pojo.entity.Problem">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="problemId" column="problemId" jdbcType="VARCHAR"/>
+            <result property="title" column="title" jdbcType="VARCHAR"/>
+            <result property="author" column="author" jdbcType="VARCHAR"/>
+            <result property="tagList" column="tagList" jdbcType="VARCHAR"/>
+            <result property="timeLimit" column="timeLimit" jdbcType="INTEGER"/>
+            <result property="memoryLimit" column="memoryLimit" jdbcType="INTEGER"/>
+            <result property="stackLimit" column="stackLimit" jdbcType="INTEGER"/>
+            <result property="description" column="description" jdbcType="VARCHAR"/>
+            <result property="input" column="input" jdbcType="VARCHAR"/>
+            <result property="output" column="output" jdbcType="VARCHAR"/>
+            <result property="source" column="source" jdbcType="VARCHAR"/>
+            <result property="difficulty" column="difficulty" jdbcType="INTEGER"/>
+            <result property="auth" column="auth" jdbcType="INTEGER"/>
+            <result property="judgeMode" column="judgeMode" jdbcType="VARCHAR"/>
+            <result property="spjCode" column="spjCode" jdbcType="VARCHAR"/>
+            <result property="spjLanguage" column="spjLanguage" jdbcType="VARCHAR"/>
+            <result property="modifiedUser" column="modifiedUser" jdbcType="VARCHAR"/>
+            <result property="isFileIo" column="isFileIo" jdbcType="TINYINT"/>
+            <result property="ioReadFileName" column="ioReadFileName" jdbcType="VARCHAR"/>
+            <result property="ioWriteFileName" column="ioWriteFileName" jdbcType="VARCHAR"/>
+            <result property="createTime" column="createTime" jdbcType="TIMESTAMP"/>
+            <result property="updateTime" column="updateTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,problemId,title,tag,
+        author,timeLimit,memoryLimit,
+        stackLimit,description,input,
+        output,source,difficulty,
+        auth,judgeMode,spjCode,
+        spjLanguage,modifiedUser,isFileIo,
+        ioReadFileName,ioWriteFileName,createTime,
+        updateTime
+    </sql>
+</mapper>
