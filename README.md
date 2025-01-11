@@ -7,4 +7,4 @@
 | 仓库                                                                          | 描述      |
 |-----------------------------------------------------------------------------|---------|
 | [chuan-wxy/WOJ-microservice](https://github.com/chuan-wxy/WOJ-microservice) | 后端代码仓库  |
-| [chuan-wxy/WOJ-web](https://github.com/chuan-wxy/WOJ-microservice)          | 前端端代码仓库 |
+| [chuan-wxy/WOJ-web](https://github.com/chuan-wxy/WOJ-web)                   | 前端端代码仓库 |
