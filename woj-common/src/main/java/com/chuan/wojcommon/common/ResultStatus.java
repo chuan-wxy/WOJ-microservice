@@ -9,11 +9,11 @@ package com.chuan.wojcommon.common;
 
 public enum ResultStatus {
 
-    SUCCESS(0,"成功"),
+    SUCCESS(200,"成功"),
 
     FAIL(400,"失败"),
 
-    ACCESS_DENIED(401,"访问受限"),
+    UNAUTHORIZED(401,"未登录或登录过期，请重新登录"),
 
     FORBIDDEN(403,"拒绝访问"),
 
