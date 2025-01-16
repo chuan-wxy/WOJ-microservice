@@ -10,7 +10,6 @@ import com.chuan.wojmodel.pojo.dto.user.UserRegisterDTO;
 import com.chuan.wojmodel.pojo.entity.User;
 import com.chuan.wojmodel.pojo.vo.user.UserLoginVO;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 
 import java.util.List;
 
@@ -24,11 +23,11 @@ public interface UserService extends IService<User> {
 
     BaseResponse<Void> register(UserRegisterDTO userAddDTO) throws StatusFailException;
 
-    BaseResponse<UserLoginVO> login(UserLoginDTO userLoginDTO, HttpServletRequest request, HttpServletResponse response);
+    BaseResponse<UserLoginVO> login(UserLoginDTO userLoginDTO, HttpServletRequest request);
 
     BaseResponse<Void> updateProfile(UserProfileDTO userProfileDTO);
 
-    BaseResponse<Void> logout(UserLogoutDTO userLogoutDTO);
+    BaseResponse<Void> logout(HttpServletRequest request);
 
     BaseResponse<Void> getLogoutCode(UserLogoutDTO userLogoutDTO);
 
