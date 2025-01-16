@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
  *
  * @Author: chuan-wxy
  * @Date: 2024/8/19 18:26
- * @Description:
+ * @Description:token失效,请重新登陆
  */
 @Slf4j
 @RestControllerAdvice
@@ -24,7 +24,7 @@ public class GlobalExceptionHandler {
     }
     @ExceptionHandler(StatusFailException.class)
     public BaseResponse businessExceptionHandler(StatusFailException e) {
-        log.error("全局异常响应器---->Exception:{}", e);
+        log.error("全局异常响应器---->StatusFailException:{}", e);
         return ResultUtils.error(e.code,e.getMessage());
     }
 }

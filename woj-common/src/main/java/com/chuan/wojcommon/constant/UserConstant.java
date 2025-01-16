@@ -7,16 +7,16 @@ package com.chuan.wojcommon.constant;
  * @Date: 2024/8/20 12:10
  * @Description:
  */
-public interface UserConstant {
+public class UserConstant {
 
-    String ROOR = "root";
-    String AMDIN = "admin";
-    String DEFAULT_USER = "default_user";
-    String MUTE_USER = "mute_user";
-    String NO_DISCUSS_USER = "no_discuss_user";
-    String NO_SUBMIT_MUTE_USER = "no_submit_mute_user";
-    String NO_SUBMIT_NO_DISCUSS_USER = "no_submit_no_discuss_user";
-    String NO_SUBMIT_USER = "no_submit_user";
-    String PROBLEM_ADMIN = "problem_admin";
+    public static final String ROOR = "root";
+    public static final String AMDIN = "admin";
+    public static final String DEFAULT_USER = "default_user";
+    public static final String MUTE_USER = "mute_user";
+    public static final String NO_DISCUSS_USER = "no_discuss_user";
+    public static final String NO_SUBMIT_MUTE_USER = "no_submit_mute_user";
+    public static final String NO_SUBMIT_NO_DISCUSS_USER = "no_submit_no_discuss_user";
+    public static final String NO_SUBMIT_USER = "no_submit_user";
+    public static final String PROBLEM_ADMIN = "problem_admin";
 
 }
