@@ -1,6 +1,11 @@
 package com.chuan.wojgateway.filter;
 
+import com.alibaba.fastjson.JSON;
+import com.chuan.wojcommon.common.BaseResponse;
+import com.chuan.wojcommon.common.ResultStatus;
+import com.chuan.wojcommon.constant.RedisContant;
 import com.chuan.wojcommon.utils.JwtUtil;
+import com.chuan.wojcommon.utils.RedisUtil;
 import com.chuan.wojgateway.UrlAuthProperties;
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
@@ -36,9 +41,14 @@ public class GlobalAuthFilter implements GlobalFilter, Ordered{
     @Autowired
     private UrlAuthProperties urlAuthProperties;
 
+    @Autowired
+    private RedisUtil redisUtil;
+
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         ServerHttpResponse response = exchange.getResponse();
+        response.getHeaders().add("Content-Type", "application/json;charset=utf-8");
+
         DataBufferFactory dataBufferFactory = response.bufferFactory();
 
         ServerHttpRequest request = exchange.getRequest();
@@ -50,19 +60,25 @@ public class GlobalAuthFilter implements GlobalFilter, Ordered{
 
         // 判断路径是否包含inner
         if(antPathMatcher.match("/**/inner/**", path)) {
-            response.setStatusCode(HttpStatus.FORBIDDEN);
-            DataBuffer dataBuffer = dataBufferFactory.wrap("无权限".getBytes(StandardCharsets.UTF_8));
+            BaseResponse<String> res = new BaseResponse<>(ResultStatus.FORBIDDEN);
+            DataBuffer dataBuffer = dataBufferFactory.wrap(JSON.toJSONString(res).getBytes(StandardCharsets.UTF_8));
             return response.writeWith(Mono.just(dataBuffer));
         }
-        // todo jwt鉴权
 
-        // 白名单直接放行不做token校验
+        // 白名单直接放行,不做 token 校验
         if (isWhitelist(request)) {
-            System.out.println(request.getPath()+"白名单");;
             return chain.filter(exchange);
         }
-        System.out.println(request.getPath()+"不是白名单");
 
+        // 获取 redis 中的登记信息
+        Object userAccount = redisUtil.get(RedisContant.USER_TOKEN + token);
+
+        //验证 token （ token 为空或 redis 中不存在登记信息）
+        if (token == null || token.isBlank() || userAccount == null) {
+            BaseResponse<String> res = new BaseResponse<>(ResultStatus.UNAUTHORIZED);
+            DataBuffer dataBuffer = dataBufferFactory.wrap(JSON.toJSONString(res).getBytes(StandardCharsets.UTF_8));
+            return response.writeWith(Mono.just(dataBuffer));
+        }
 
         // 需要管理员权限
         if(antPathMatcher.match("/**/admin/**", path)) {
