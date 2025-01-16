@@ -62,7 +62,7 @@ public class EmailServiceImpl implements EmailService {
         log.info(email+"正在发送验证码");
         if(EmailUtil.send(email,numbers,content)) {
             log.info(email+"验证码发送成功");
-            return new BaseResponse(ResultStatus.SUCCESS);
+            return new BaseResponse(ResultStatus.OK);
         } else {
             log.info(email + "验证码发送失败");
             return new BaseResponse(400,"验证码发送失败");

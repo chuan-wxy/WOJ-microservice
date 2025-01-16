@@ -38,7 +38,7 @@ public class EmailUtil {
 
     private static  String staticPassword;
     
-    private EmailUtil(){}
+    private EmailUtil(){};
     
     @PostConstruct
     public void init() {
