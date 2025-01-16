@@ -10,7 +10,6 @@ import com.chuan.wojmodel.pojo.vo.user.UserLoginVO;
 import com.chuan.wojuserservice.service.EmailService;
 import com.chuan.wojuserservice.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -52,8 +51,8 @@ public class UserController {
      * @return BaseResponse<UserLoginVO>
      */
     @PostMapping("/login")
-    public BaseResponse<UserLoginVO> login(@RequestBody UserLoginDTO userLoginDTO, HttpServletRequest request, HttpServletResponse response) {
-        return userService.login(userLoginDTO, request, response);
+    public BaseResponse<UserLoginVO> login(@RequestBody UserLoginDTO userLoginDTO, HttpServletRequest request) {
+        return userService.login(userLoginDTO, request);
     }
 
     /**
@@ -89,8 +88,8 @@ public class UserController {
      * 退出登录
      */
     @PostMapping("/logout")
-    public BaseResponse<Void> logout(@RequestBody UserLogoutDTO userLogoutDTO) {
-        return userService.logout(userLogoutDTO);
+    public BaseResponse<Void> logout(HttpServletRequest request) {
+        return userService.logout(request);
     }
 
     /**

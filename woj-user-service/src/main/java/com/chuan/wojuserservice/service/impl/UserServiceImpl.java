@@ -9,8 +9,8 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.chuan.wojcommon.common.BaseResponse;
-import com.chuan.wojcommon.common.enums.AccountEnum;
 import com.chuan.wojcommon.common.enums.EmailEnum;
+import com.chuan.wojcommon.constant.RedisContant;
 import com.chuan.wojcommon.exception.StatusFailException;
 import com.chuan.wojcommon.utils.EmailUtil;
 import com.chuan.wojcommon.utils.JwtUtil;
@@ -28,7 +28,6 @@ import com.chuan.wojuserservice.mapper.UserMapper;
 import com.chuan.wojuserservice.mapper.UserRoleMapper;
 import com.chuan.wojuserservice.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -48,19 +47,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     public static final String SALT = "wxy";
     @Autowired
-    UserMapper userMapper;
+    private UserMapper userMapper;
 
     @Autowired
-    UserRoleMapper userRoleMapper;
+    private UserRoleMapper userRoleMapper;
 
     @Autowired
-    RoleMapper roleMapper;
+    private RoleMapper roleMapper;
 
     @Autowired
-    RedisUtil redisUtil;
-
-    @Autowired
-    JwtUtil jwtUtil;
+    private RedisUtil redisUtil;
 
     /**
      * 用户注册
@@ -135,7 +131,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      * @return
      */
     @Override
-    public BaseResponse<UserLoginVO> login(UserLoginDTO userLoginDTO, HttpServletRequest request, HttpServletResponse response) {
+    public BaseResponse<UserLoginVO> login(UserLoginDTO userLoginDTO, HttpServletRequest request) {
         String userAccount = userLoginDTO.getUserAccount();
         String userPassword = userLoginDTO.getUserPassword();
 
@@ -143,9 +139,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             return ResultUtils.error(400, "账户密码不能为空");
         }
 
-        String key = AccountEnum.TRY_LOGIN_NUM + userAccount;
+        String key = RedisContant.TRY_LOGIN_NUM + userAccount;
         Integer tryLoginCount = (Integer) redisUtil.get(key);
-        if(tryLoginCount != null && tryLoginCount >= 10) {
+        if(tryLoginCount != null && tryLoginCount >= 5) {
             return new BaseResponse(400,"登录失败次数过多！您的账号有风险，半个小时内暂时无法登录！");
         }
 
@@ -166,10 +162,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                 redisUtil.del(key);
             }
 
-            String JWT = jwtUtil.generateJwt(userAccount);
+            String JWT = JwtUtil.generateJwt(userAccount);
             userLoginVO.setJwt(JWT);
 
-            redisUtil.set(JWT,0,30*60);
+            // 时间与 JWT 令牌的时间相同（3天）
+            redisUtil.set(RedisContant.USER_TOKEN + JWT, userAccount,72*60*60);
 
             request.getSession().setAttribute("user_login", user);
 
@@ -242,27 +239,25 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     /**
-     * 用户退出
+     * 退出功能
      *
-     * @param userLogoutDTO
+     * @param request
      * @return
      */
     @Override
-    public BaseResponse<Void> logout(UserLogoutDTO userLogoutDTO) {
-        log.debug("UserServiceImpl---->logout");
-        String JWT = userLogoutDTO.getCode();
+    public BaseResponse<Void> logout(HttpServletRequest request) {
 
-        if(JWT==null) {
+        String token = String.valueOf(request.getHeader("Authorization"));
+
+        if(token==null) {
             log.info("Jwt为空");
-            return ResultUtils.error("jwt不能为空");
+            return ResultUtils.success();
         }
 
-        if(!jwtUtil.hasToken(JWT)) {
-            log.info("不存在改jwt");
-            return ResultUtils.error("不存在改jwt");
+        if(RedisUtil.get(RedisContant.USER_TOKEN + token) == null) {
+            return ResultUtils.success();
         }
-
-        jwtUtil.cleanToken(JWT);
+        RedisUtil.del(RedisContant.USER_TOKEN + token);
         return ResultUtils.success();
     }
 
@@ -319,7 +314,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         String userAccount = userLogoutDTO.getUserAccount();
         String code = userLogoutDTO.getCode();
 
-        Integer tryLogoutNum = (Integer) redisUtil.get(AccountEnum.TRY_LOGIN_NUM.getCode() + userAccount);
+        Integer tryLogoutNum = (Integer) redisUtil.get(RedisContant.TRY_LOGIN_NUM + userAccount);
 
         if(tryLogoutNum != null && tryLogoutNum > 3) {
             log.info("{}多次注销，异常行为被拦截",userAccount);
@@ -329,9 +324,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         String redisKey = (String) redisUtil.get(EmailEnum.LOGOUT_KEY_PREFIX.getValue() + userAccount);
         if(!redisKey.equals(code)) {
             if (tryLogoutNum != null) {
-                redisUtil.set(AccountEnum.TRY_LOGIN_NUM + userAccount, tryLogoutNum + 1, 30 * 60);
+                redisUtil.set(RedisContant.TRY_LOGIN_NUM + userAccount, tryLogoutNum + 1, 30 * 60);
             } else {
-                redisUtil.set(AccountEnum.TRY_LOGIN_NUM + userAccount, 1, 30 * 60);
+                redisUtil.set(RedisContant.TRY_LOGIN_NUM + userAccount, 1, 30 * 60);
             }
             return ResultUtils.error("验证码错误");
         }
