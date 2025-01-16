@@ -90,32 +90,6 @@ public class GlobalAuthFilter implements GlobalFilter, Ordered{
             DataBuffer dataBuffer = dataBufferFactory.wrap("无权限".getBytes(StandardCharsets.UTF_8));
             return response.writeWith(Mono.just(dataBuffer));
         }
-
-//        // token为空或者过期
-//        if (StringUtils.isBlank(token) || JwtUtil.isExpire(token)) {
-//            response.setStatusCode(HttpStatus.UNAUTHORIZED);
-//            DataBuffer dataBuffer = dataBufferFactory.wrap("未登录或登录过期".getBytes(StandardCharsets.UTF_8));
-//            return response.writeWith(Mono.just(dataBuffer));
-//        }
-//        System.out.println(request.getPath()+"不是白名单danyoutoken");
-
-//        LoginContext loginContext = JWTUtil.getCurrentUser(token);
-//        loginContext.setClientType(ClientType.ADMIN);
-//        LoginContextHolder.set(loginContext);
-//
-//        String text = JSON.toJSONString(loginContext);
-//        log.info("LoginContext:{}", text);
-//        String unicode = UnicodeUtil.toUnicode(text, true);
-//        String[] headerValues = new String[]{unicode};
-//
-//        ServerHttpRequest newRequest = exchange.getRequest().mutate()
-//                .header(LoginContextConst.LOGIN_USER, headerValues)
-//                .header(LoginContextConst.TOKEN, JWT).build();
-//        //构建新的ServerWebExchange实例
-//        ServerWebExchange newExchange = exchange.mutate().request(newRequest).build();
-//
-//        return chain.filter(newExchange);
-
         return chain.filter(exchange);
     }
 
