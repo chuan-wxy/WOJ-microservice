@@ -15,3 +15,7 @@ emailUtil:
   account: 3153917921@qq.com
   password: unijbjmgvfspdddb
   name: AcKing
+
+redis:
+  tokenExpire: 259200;
+  secret: "23e2q1exd2q1e4dxq14edxq2145rq23r5fasdasdq2wed21qed2q1edq21"

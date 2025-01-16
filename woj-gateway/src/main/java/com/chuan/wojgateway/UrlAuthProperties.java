@@ -21,6 +21,7 @@ public class UrlAuthProperties {
             "/api/web/problem/search-problemtitlelist",
             "/api/web/problem/get-problemtaglist",
             "/api/web/problem/get-problem",
+            "/api/web/announcement/get-announcement-list",
             "/api/user/login",
             "/api/web/v3/api-docs",
             "/api/user/v3/api-docs",
