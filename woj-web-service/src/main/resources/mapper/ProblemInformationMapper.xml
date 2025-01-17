@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chuan.wojwebservice.mapper.ProblemInformationMapper">
+
+    <resultMap id="BaseResultMap" type="com.chuan.wojmodel.pojo.entity.ProblemInformation">
+            <id property="pid" column="pid" jdbcType="BIGINT"/>
+            <result property="subnum" column="subNum" jdbcType="INTEGER"/>
+            <result property="acnum" column="acNum" jdbcType="INTEGER"/>
+            <result property="cenum" column="ceNum" jdbcType="INTEGER"/>
+            <result property="wanum" column="waNum" jdbcType="INTEGER"/>
+            <result property="tlenum" column="tleNum" jdbcType="INTEGER"/>
+            <result property="mlenum" column="mleNum" jdbcType="INTEGER"/>
+            <result property="renum" column="reNum" jdbcType="INTEGER"/>
+            <result property="sfnum" column="sfNum" jdbcType="INTEGER"/>
+            <result property="createtime" column="createTime" jdbcType="TIMESTAMP"/>
+            <result property="updatetime" column="updateTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        pid,subNum,acNum,
+        ceNum,waNum,tleNum,
+        mleNum,reNum,sfNum,
+        createTime,updateTime
+    </sql>
+</mapper>
