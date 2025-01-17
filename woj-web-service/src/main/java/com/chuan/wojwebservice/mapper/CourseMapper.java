@@ -7,7 +7,7 @@ import com.chuan.wojmodel.pojo.entity.Course;
 import java.util.List;
 
 /**
-* @author lenovo
+* @author chuan-wxy
 * @description 针对表【course】的数据库操作Mapper
 * @createDate 2024-09-25 16:42:58
 * @Entity generator.domain.Course

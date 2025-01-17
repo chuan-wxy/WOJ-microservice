@@ -7,7 +7,7 @@ import org.apache.ibatis.annotations.Mapper;
 import java.util.List;
 
 /**
-* @author lenovo
+* @author chuan-wxy
 * @description 针对表【role】的数据库操作Mapper
 * @createDate 2024-08-20 12:26:42
 * @Entity org.chuan.woj.pojo.entity.Role

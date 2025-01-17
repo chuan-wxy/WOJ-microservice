@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 /**
-* @author lenovo
+* @author chuan-wxy
 * @description 针对表【announcement】的数据库操作Service实现
 * @createDate 2024-10-06 19:45:34
 */

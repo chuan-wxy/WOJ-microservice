@@ -8,7 +8,7 @@ import com.chuan.wojmodel.pojo.vo.activity.ActivityTitleVO;
 import java.util.List;
 
 /**
-* @author lenovo
+* @author chuan-wxy
 * @description 针对表【activity】的数据库操作Mapper
 * @createDate 2024-10-02 19:37:38
 * @Entity generator.domain.Activity

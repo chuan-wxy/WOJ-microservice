@@ -7,7 +7,7 @@ import com.chuan.wojuserservice.service.UserRoleService;
 import org.springframework.stereotype.Service;
 
 /**
-* @author lenovo
+* @author chuan-wxy
 * @description 针对表【userrole】的数据库操作Service实现
 * @createDate 2024-08-20 12:22:33
 */

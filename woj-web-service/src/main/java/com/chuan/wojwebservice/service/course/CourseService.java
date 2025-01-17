@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
-* @author lenovo
+* @author chuan-wxy
 * @description 针对表【course】的数据库操作Service
 * @createDate 2024-09-25 16:42:58
 */

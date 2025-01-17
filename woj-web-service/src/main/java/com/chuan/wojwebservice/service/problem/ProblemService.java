@@ -12,7 +12,7 @@ import com.chuan.wojmodel.pojo.entity.Problem;
 import com.chuan.wojmodel.pojo.vo.problem.ProblemTitleVO;
 import com.chuan.wojmodel.pojo.vo.problem.ProblemVO;
 /**
-* @author lenovo
+* @author chuan-wxy
 * @description 针对表【problem】的数据库操作Service
 * @createDate 2024-08-26 16:25:01
 */

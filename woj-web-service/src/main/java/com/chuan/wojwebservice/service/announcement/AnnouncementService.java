@@ -11,7 +11,7 @@ import com.chuan.wojmodel.pojo.vo.announcement.AnnouncementTitleVO;
 import java.util.List;
 
 /**
-* @author lenovo
+* @author chuan-wxy
 * @description 针对表【announcement】的数据库操作Service
 * @createDate 2024-10-06 19:45:34
 */
