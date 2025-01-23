@@ -1,7 +1,7 @@
 package com.chuan.wojjudgeservice.service;
 
 import com.chuan.wojcommon.exception.StatusFailException;
-import com.chuan.wojmodel.pojo.vo.problemSubmit.ProblemSubmitVO;
+import com.chuan.wojmodel.pojo.codesandbox.ExecuteCodeResponse;
 
 import java.io.IOException;
 
@@ -11,5 +11,5 @@ import java.io.IOException;
  * @Description:
  */
 public interface JudgeService {
-    ProblemSubmitVO doJudge(long problemSubmitId) throws StatusFailException, IOException, InterruptedException;
+    ExecuteCodeResponse doJudge(long problemSubmitId) throws StatusFailException, IOException, InterruptedException;
 }

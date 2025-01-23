@@ -14,11 +14,13 @@ import com.chuan.wojcommon.utils.ResultUtils;
 import com.chuan.wojmodel.pojo.dto.problem.ProblemAddDTO;
 import com.chuan.wojmodel.pojo.dto.problem.ProblemUpdateDTO;
 import com.chuan.wojmodel.pojo.entity.Problem;
+import com.chuan.wojmodel.pojo.entity.ProblemInformation;
 import com.chuan.wojmodel.pojo.entity.ProblemTag;
 import com.chuan.wojmodel.pojo.entity.Tag;
 import com.chuan.wojmodel.pojo.vo.problem.ProblemTitleVO;
 import com.chuan.wojmodel.pojo.vo.problem.ProblemVO;
 import com.chuan.wojwebservice.manager.ProblemManager;
+import com.chuan.wojwebservice.mapper.ProblemInformationMapper;
 import com.chuan.wojwebservice.mapper.ProblemMapper;
 import com.chuan.wojwebservice.mapper.ProblemTagMapper;
 import com.chuan.wojwebservice.mapper.TagMapper;
@@ -46,7 +48,10 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem>
     private ProblemTagMapper problemTagMapper;
 
     @Autowired
-    ProblemManager problemManager;
+    private ProblemManager problemManager;
+
+    @Autowired
+    private ProblemInformationMapper problemInformationMapper;
 
 
     @Autowired
@@ -59,6 +64,7 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem>
         problemManager.validateSubmitInfo(problemAddDTO);
 
         String author = problemAddDTO.getAuthor();
+        String source = problemAddDTO.getSource();
 
         Problem problem = new Problem();
         BeanUtils.copyProperties(problemAddDTO, problem);
@@ -66,9 +72,12 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem>
 
         int row = problemMapper.insert(problem);
         if (row != 1) {
-            log.info("ProblemServiceImpl---->addProblem()---row非1,插入Problem失败");
+            log.info("[addProblem] row非1,插入Problem失败");
             return ResultUtils.error("插入失败");
         }
+
+        ProblemInformation problemInformation = new ProblemInformation();
+        problemInformationMapper.insert(problemInformation);
 
         QueryWrapper<Problem> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("problemId", problemAddDTO.getProblemId());
@@ -85,7 +94,7 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem>
 
             row = problemTagMapper.insert(problemTag);
             if (row != 1) {
-                log.info("ProblemServiceImpl---->addProblem()---插入ProblemTag失败");
+                log.info("[addProblem] 插入ProblemTag失败");
                 throw new StatusSystemErrorException("插入失败");
             }
         }
@@ -198,6 +207,20 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem>
         }
 
         return ResultUtils.success("更新成功");
+    }
+
+    @Override
+    public BaseResponse<ProblemInformation> getProblemInformation(Long id) {
+        if(id == null) {
+            return ResultUtils.error("id为空");
+        }
+        QueryWrapper<ProblemInformation> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("pid", id);
+        ProblemInformation problemInformation = problemInformationMapper.selectOne(queryWrapper);
+        if(problemInformation == null) {
+            return ResultUtils.error("id错误");
+        }
+        return ResultUtils.success(problemInformation);
     }
 }
 

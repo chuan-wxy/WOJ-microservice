@@ -10,37 +10,17 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * 
+ *
  * @TableName problem_submit
  */
 @TableName(value ="problem_submit")
 @Data
 public class ProblemSubmit implements Serializable {
     /**
-     * 
+     *
      */
     @TableId(type = IdType.AUTO)
     private Long id;
-
-    /**
-     * 代码语言
-     */
-    private String language;
-
-    /**
-     * 提交代码
-     */
-    private String code;
-
-    /**
-     * 判题信息
-     */
-    private String judgeInfo;
-
-    /**
-     * 判题状态（0 - 待判题、1 - 判题中、2 - 判题结束）
-     */
-    private Integer state;
 
     /**
      * 题目id
@@ -53,12 +33,42 @@ public class ProblemSubmit implements Serializable {
     private String uid;
 
     /**
-     * 
+     * 代码语言
+     */
+    private String language;
+
+    /**
+     * 提交代码
+     */
+    private String code;
+
+    /**
+     * 判题结果
+     */
+    private String judgeResult;
+
+    /**
+     * 用时列表
+     */
+    private String timeList;
+
+    /**
+     * 内存列表
+     */
+    private String memoryList;
+
+    /**
+     * 栈内存列表
+     */
+    private String stackList;
+
+    /**
+     *
      */
     private Date createtime;
 
     /**
-     * 
+     *
      */
     private Date updatetime;
 

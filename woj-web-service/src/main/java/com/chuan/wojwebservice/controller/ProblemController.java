@@ -7,6 +7,7 @@ import com.chuan.wojcommon.exception.StatusFailException;
 import com.chuan.wojcommon.exception.StatusSystemErrorException;
 import com.chuan.wojmodel.pojo.dto.problem.ProblemAddDTO;
 import com.chuan.wojmodel.pojo.dto.problem.ProblemUpdateDTO;
+import com.chuan.wojmodel.pojo.entity.ProblemInformation;
 import com.chuan.wojmodel.pojo.vo.problem.ProblemTitleVO;
 import com.chuan.wojmodel.pojo.vo.problem.ProblemVO;
 import com.chuan.wojmodel.pojo.vo.problem.TagVO;
@@ -81,6 +82,19 @@ public class ProblemController {
     @GetMapping("/get-problem")
     public BaseResponse<ProblemVO> getProblem(@RequestParam(value = "id") Long id) throws StatusFailException {
         return problemService.getProblem(id);
+    }
+
+    /**
+     * 获取题目提交统计信息
+     *
+     * @param id
+     * @return
+     * @throws StatusFailException
+     */
+
+    @GetMapping("/get-probleminformation")
+    public BaseResponse<ProblemInformation> getProblemInformation(@RequestParam(value = "id") Long id) throws StatusFailException {
+        return problemService.getProblemInformation(id);
     }
 
     /**

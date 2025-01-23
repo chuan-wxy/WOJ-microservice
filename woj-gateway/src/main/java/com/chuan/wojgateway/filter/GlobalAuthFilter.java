@@ -71,7 +71,7 @@ public class GlobalAuthFilter implements GlobalFilter, Ordered{
         }
 
         // 获取 redis 中的登记信息
-        Object userAccount = redisUtil.get(RedisContant.USER_TOKEN + token);
+        Object userAccount = RedisUtil.get(RedisContant.USER_TOKEN + token);
 
         //验证 token （ token 为空或 redis 中不存在登记信息）
         if (token == null || token.isBlank() || userAccount == null) {

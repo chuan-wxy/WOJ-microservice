@@ -1,8 +1,8 @@
 package com.chuan.wojjudgeservice.codesandbox;
 
 import com.chuan.wojcommon.exception.StatusFailException;
+import com.chuan.wojmodel.pojo.codesandbox.ExecuteCodeResponse;
 import com.chuan.wojmodel.pojo.codesandbox.ExecuteCodeRequest;
-import com.chuan.wojmodel.pojo.dto.problemSubmit.JudgeInfo;
 import com.chuan.wojmodel.pojo.entity.Problem;
 import org.springframework.stereotype.Component;
 
@@ -19,5 +19,6 @@ public interface CodeSandbox {
      * @param executeCodeRequest
      * @return
      */
-    JudgeInfo executeCode(ExecuteCodeRequest executeCodeRequest, Problem problem) throws IOException, InterruptedException, StatusFailException;
+    ExecuteCodeResponse executeCode(ExecuteCodeRequest executeCodeRequest, Problem problem) throws IOException, InterruptedException,
+            StatusFailException;
 }

@@ -5,20 +5,23 @@
 <mapper namespace="com.chuan.wojwebservice.mapper.ProblemSubmitMapper">
 
     <resultMap id="BaseResultMap" type="com.chuan.wojmodel.pojo.entity.ProblemSubmit">
-            <id property="id" column="id" jdbcType="BIGINT"/>
-            <result property="language" column="language" jdbcType="VARCHAR"/>
-            <result property="code" column="code" jdbcType="VARCHAR"/>
-            <result property="judgeInfo" column="judgeInfo" jdbcType="VARCHAR"/>
-            <result property="state" column="state" jdbcType="INTEGER"/>
-            <result property="pid" column="pid" jdbcType="BIGINT"/>
-            <result property="uid" column="uid" jdbcType="VARCHAR"/>
-            <result property="createtime" column="createTime" jdbcType="TIMESTAMP"/>
-            <result property="updatetime" column="updateTime" jdbcType="TIMESTAMP"/>
+        <id property="id" column="id" jdbcType="BIGINT"/>
+        <result property="pid" column="pid" jdbcType="BIGINT"/>
+        <result property="uid" column="uid" jdbcType="VARCHAR"/>
+        <result property="language" column="language" jdbcType="VARCHAR"/>
+        <result property="code" column="code" jdbcType="VARCHAR"/>
+        <result property="judgeresult" column="judgeResult" jdbcType="VARCHAR"/>
+        <result property="timelist" column="timeList" jdbcType="VARCHAR"/>
+        <result property="memorylist" column="memoryList" jdbcType="VARCHAR"/>
+        <result property="stacklist" column="stackList" jdbcType="VARCHAR"/>
+        <result property="createtime" column="createTime" jdbcType="TIMESTAMP"/>
+        <result property="updatetime" column="updateTime" jdbcType="TIMESTAMP"/>
     </resultMap>
 
     <sql id="Base_Column_List">
-        id,language,code,
-        judgeInfo,state,pid,
-        uid,createTime,updateTime
+        id,pid,uid,
+        language,code,judgeResult,
+        timeList,memoryList,stackList,
+        createTime,updateTime
     </sql>
 </mapper>

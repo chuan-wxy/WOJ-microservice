@@ -1,9 +1,9 @@
 package com.chuan.wojmodel.pojo.vo.problemSubmit;
 
-import com.chuan.wojmodel.pojo.dto.problemSubmit.JudgeInfo;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * @Author: chuan-wxy
@@ -16,25 +16,10 @@ public class ProblemSubmitVO  implements Serializable {
      * id
      */
     private Long id;
-
-    /**
-     * 代码语言
-     */
-    private String language;
-
-    /**
-     * 提交代码
-     */
-    private String code;
-
-    /**
-     * 判题信息
-     */
-    private JudgeInfo judgeInfo;
-    /**
-     * 判题状态（0 - 待判题、1 - 判题中、2 - 判题结束）
-     */
-    private Integer state;
+    private String result;
+    private List<Long> timeLit;
+    private List<Long> memoryLit;
+    private List<Long> stackLit;
 
     /**
      * 题目id

@@ -9,6 +9,7 @@ import com.chuan.wojcommon.exception.StatusSystemErrorException;
 import com.chuan.wojmodel.pojo.dto.problem.ProblemAddDTO;
 import com.chuan.wojmodel.pojo.dto.problem.ProblemUpdateDTO;
 import com.chuan.wojmodel.pojo.entity.Problem;
+import com.chuan.wojmodel.pojo.entity.ProblemInformation;
 import com.chuan.wojmodel.pojo.vo.problem.ProblemTitleVO;
 import com.chuan.wojmodel.pojo.vo.problem.ProblemVO;
 /**
@@ -31,4 +32,6 @@ public interface ProblemService extends IService<Problem> {
     BaseResponse<IPage<ProblemTitleVO>> searchProblemTitleTwo(Integer current, Integer size, Long id, String tags, String difficulty, String title) throws StatusFailException;
 
     BaseResponse<String> updateProblem(ProblemUpdateDTO problemUpdateDTO) throws StatusFailException;
+
+    BaseResponse<ProblemInformation> getProblemInformation(Long id);
 }
