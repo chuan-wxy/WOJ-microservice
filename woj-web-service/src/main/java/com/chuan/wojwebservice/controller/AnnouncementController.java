@@ -24,31 +24,27 @@ public class AnnouncementController {
     @Autowired
     AnnouncementService announcementService;
 
-    /**
-     * 新增活动
-     * @param announcementAddDTO
-     * @return
-     */
+    /** 新增活动 */
     @PostMapping("/add")
     public BaseResponse<String> addAnnouncement(@RequestBody AnnouncementAddDTO announcementAddDTO) throws StatusFailException {
         return announcementService.addAnnouncement(announcementAddDTO);
     }
 
-    /**
-     * 获取活动标题列表
-     * @return
-     */
+    /** 获取活动标题列表 */
     @GetMapping("/get-announcement-list")
     public BaseResponse<List<AnnouncementTitleVO>> getAnnouncementList() {
         return announcementService.getAnnouncementList();
     }
 
-    /**
-     * 获取单个活动文章
-     * @return
-     */
+    /** 获取单个活动文章 */
     @GetMapping("/get-announcement")
     public BaseResponse<AnnouncementContentVO> getAnnouncement(@RequestParam(value = "id") Integer id) throws StatusFailException {
         return announcementService.getAnnouncement(id);
+    }
+
+    /** 获取最新活动文章 */
+    @GetMapping("/get-last-announcement")
+    public BaseResponse<AnnouncementContentVO> getLastAnnouncement() {
+        return announcementService.getLastAnnouncement();
     }
 }

@@ -44,7 +44,7 @@ public class ProblemSubmitController {
                                                   HttpServletRequest request) throws StatusFailException, StatusSystemErrorException, IOException, InterruptedException {
         final UserLoginVO loginUser = userFeignClient.getLoginUser(request).getData();
 
-        String userAccount = loginUser.getUserAccount();
+        String userAccount = loginUser.getUserInfo().getUserAccount();
 
         User user = userFeignClient.getOneByUserAccount(userAccount);
 

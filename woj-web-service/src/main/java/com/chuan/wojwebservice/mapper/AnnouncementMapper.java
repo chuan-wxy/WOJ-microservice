@@ -18,6 +18,8 @@ public interface AnnouncementMapper extends BaseMapper<Announcement> {
     List<AnnouncementTitleVO> selectAnnouncementTitleList();
 
     AnnouncementContentVO selectAnnouncementContentVO(Integer id);
+
+    AnnouncementContentVO selectLatestAnnouncementContentVO();
 }
 
 

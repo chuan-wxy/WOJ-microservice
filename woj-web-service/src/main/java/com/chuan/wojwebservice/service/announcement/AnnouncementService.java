@@ -22,4 +22,6 @@ public interface AnnouncementService extends IService<Announcement> {
     BaseResponse<List<AnnouncementTitleVO>> getAnnouncementList();
 
     BaseResponse<AnnouncementContentVO> getAnnouncement(Integer id) throws StatusFailException;
+
+    BaseResponse<AnnouncementContentVO> getLastAnnouncement()  ;
 }

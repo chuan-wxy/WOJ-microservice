@@ -6,6 +6,7 @@ import com.chuan.wojcommon.utils.JwtUtil;
 import com.chuan.wojcommon.utils.ResultUtils;
 import com.chuan.wojmodel.pojo.entity.User;
 import com.chuan.wojmodel.pojo.vo.user.UserLoginVO;
+import com.chuan.wojmodel.pojo.vo.user.UserVO;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.BeanUtils;
@@ -53,8 +54,10 @@ public interface UserFeignClient {
         }
 
         UserLoginVO userLoginVO = new UserLoginVO();
+        UserVO userVO = new UserVO();
 
-        BeanUtils.copyProperties(user,userLoginVO);
+        BeanUtils.copyProperties(user,userVO);
+        userLoginVO.setUserInfo(userVO);
 
         return ResultUtils.success(userLoginVO);
     };

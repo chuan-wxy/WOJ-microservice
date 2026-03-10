@@ -23,6 +23,7 @@ import com.chuan.wojmodel.pojo.dto.user.UserRegisterDTO;
 import com.chuan.wojmodel.pojo.entity.User;
 import com.chuan.wojmodel.pojo.entity.UserRole;
 import com.chuan.wojmodel.pojo.vo.user.UserLoginVO;
+import com.chuan.wojmodel.pojo.vo.user.UserVO;
 import com.chuan.wojuserservice.mapper.RoleMapper;
 import com.chuan.wojuserservice.mapper.UserMapper;
 import com.chuan.wojuserservice.mapper.UserRoleMapper;
@@ -104,7 +105,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
         String uuid = IdUtil.simpleUUID();
 
-        user.setUuid(uuid);
+        user.setId(uuid);
         user.setUserPassword(md5Password);
 
         int insertResult = userMapper.insert(user);
@@ -156,7 +157,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                 return new BaseResponse(400,"账号已被封禁，请联系管理员处理");
             }
             UserLoginVO userLoginVO = new UserLoginVO();
-            BeanUtils.copyProperties(user,userLoginVO);
+            UserVO userVO = new UserVO();
+
+            BeanUtils.copyProperties(user,userVO);
+            userLoginVO.setUserInfo(userVO);
+
             // 登陆成功清楚异常记录
             if (tryLoginCount != null) {
                 redisUtil.del(key);
@@ -164,6 +169,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
             String JWT = JwtUtil.generateJwt(userAccount);
             userLoginVO.setJwt(JWT);
+
+            List<String> userRoleList = getUserRole(userAccount).getData();
+            userLoginVO.getUserInfo().setRoles(userRoleList);
 
             // 时间与 JWT 令牌的时间相同（3天）
             redisUtil.set(RedisContant.USER_TOKEN + JWT, userAccount,72*60*60);
@@ -362,15 +370,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             throw new StatusFailException("未登录");
         }
         // 从数据库查询（追求性能的话可以注释，直接走缓存）
-        String userId = currentUser.getUuid();
+        String userId = currentUser.getId();
 
         currentUser = this.getById(userId);
         if (currentUser == null) {
             throw new StatusFailException("未登录");
         }
         UserLoginVO userLoginVO = new UserLoginVO();
+        UserVO userVO = new UserVO();
 
         BeanUtils.copyProperties(currentUser,userLoginVO);
+        userLoginVO.setUserInfo(userVO);
 
         return ResultUtils.success(userLoginVO);
 

@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * UserVO
@@ -30,9 +31,9 @@ public class UserVO implements Serializable {
     private String userName;
 
     /**
-     * 头像url
+     * 角色列表
      */
-    private String userAvatar;
+    private List<String> roles;
 
     /**
      * 用户简介
@@ -40,24 +41,59 @@ public class UserVO implements Serializable {
     private String userProfile;
 
     /**
-     * 用户角色
+     * 学校
      */
-    private String userRole;
+    private String school;
+
+    /**
+     * 专业
+     */
+    private String course;
+
+    /**
+     * 学号
+     */
+    private String number;
+
+    /**
+     * 性别
+     */
+    private String gender;
+
+    /**
+     * github地址
+     */
+    private String github;
+
+    /**
+     * 博客地址
+     */
+    private String blog;
+
+    /**
+     * 头像地址
+     */
+    private String avatar;
+
+    /**
+     * 个性签名
+     */
+    private String signature;
+
+    /**
+     * 头衔、称号
+     */
+    private String titleName;
+
+    /**
+     * 头衔、称号的颜色
+     */
+    private String titleColor;
 
     /**
      * 创建时间
      */
     private Data createTime;
-
-    /**
-     * 更新时间
-     */
-    private String updateTime;
-
-    /**
-     * 开放平台id
-     */
-    private String mpOpenId;
 
     /**
      * iserialVersionUID

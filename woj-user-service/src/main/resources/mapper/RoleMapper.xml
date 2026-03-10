@@ -19,6 +19,6 @@
     </sql>
 
     <select id="SelectRoleByUserAccount" resultType="java.lang.String">
-        select role from `role` where id in (select roleId from `user_role` where uid = (select uuid from `user_info` where userAccount = #{userAccount}))
+        select role from `role` where id in (select roleId from `user_role` where uid = (select id from `user` where userAccount = #{userAccount}))
     </select>
 </mapper>

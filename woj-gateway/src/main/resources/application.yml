@@ -4,7 +4,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/woj
     username: root
-    password: 2W0x0y40706@
+    password: 123456
   session:
     redis:
       flush-mode: on_save
@@ -58,6 +58,13 @@ knife4j:
       enabled: true
       # ④ 第四行配置，聚合子服务全部为Swagger2规范的文档
       version: openapi3
+      service-config:
+        woj-user-service:
+          group-name: woj-user-service
+        woj-web-service:
+          group-name: woj-web-service
+        woj-judge-service:
+          group-name: woj-judge-service
 
 emailUtil:
   hostName: smtp.qq.com

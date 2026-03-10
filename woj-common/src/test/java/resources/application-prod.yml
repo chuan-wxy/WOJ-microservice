@@ -7,7 +7,7 @@ redis-password: ${REDIS_PASSWORD:root@123456}
 mysql-host: ${MYSQL_HOST:127.0.0.1}
 mysql-port: ${MYSQL_PORT:3306}
 mysql-username: ${MYSQL_USERNAME:root}
-mysql-password: ${MYSQL_PASSWORD:2W0x0y40706@}
+mysql-password: ${MYSQL_PASSWORD:123456}
 
 ssl-key-store-type: ${SSL_KEY_STORE_TYPE:jks}
 ssl-key-password: ${SSL_KEY_PASSWORD:21q06e25}

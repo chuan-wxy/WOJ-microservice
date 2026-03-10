@@ -17,10 +17,17 @@
         createTime,updateTime
     </sql>
     <select id="selectAnnouncementTitleList" resultType="com.chuan.wojmodel.pojo.vo.announcement.AnnouncementTitleVO">
-        select id,title,createTime from `announcement` ORDER BY id DESC limit 4;
+        SELECT id,title,createTime FROM `announcement` ORDER BY id DESC limit 4;
     </select>
     <select id="selectAnnouncementContentVO"
             resultType="com.chuan.wojmodel.pojo.vo.announcement.AnnouncementContentVO">
-        select id,title,content,createTime from `announcement` where id =#{id};
+        SELECT id,title,content,createTime FROM `announcement` where id =#{id};
+    </select>
+
+    <select id="selectLatestAnnouncementContentVO" resultType="com.chuan.wojmodel.pojo.vo.announcement.AnnouncementContentVO">
+        SELECT id,title,content,createTime
+        FROM announcement
+        ORDER BY create_time DESC
+        LIMIT 1
     </select>
 </mapper>

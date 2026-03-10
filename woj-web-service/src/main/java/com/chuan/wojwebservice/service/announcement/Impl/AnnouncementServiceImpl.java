@@ -38,11 +38,11 @@ public class AnnouncementServiceImpl extends ServiceImpl<AnnouncementMapper, Ann
 
         Announcement announcement = new Announcement();
 
-        BeanUtils.copyProperties(announcementAddDTO,announcement);
+        BeanUtils.copyProperties(announcementAddDTO, announcement);
 
         boolean save = this.save(announcement);
 
-        if(save) {
+        if (save) {
             return ResultUtils.success("保存成功");
         } else {
             log.error("AnnouncementServiceImpl---->addAnnouncement---保存公告失败");
@@ -54,7 +54,7 @@ public class AnnouncementServiceImpl extends ServiceImpl<AnnouncementMapper, Ann
     @Override
     public BaseResponse<List<AnnouncementTitleVO>> getAnnouncementList() {
         List<AnnouncementTitleVO> announcementTitleVOS = announcementMapper.selectAnnouncementTitleList();
-        for(int i = 0;i<announcementTitleVOS.size();i++) {
+        for (int i = 0; i < announcementTitleVOS.size(); i++) {
             announcementTitleVOS.get(i).setCreateTime(announcementTitleVOS.get(i).getCreateTime().substring(0, 10));
         }
         return ResultUtils.success(announcementTitleVOS);
@@ -62,13 +62,15 @@ public class AnnouncementServiceImpl extends ServiceImpl<AnnouncementMapper, Ann
 
     @Override
     public BaseResponse<AnnouncementContentVO> getAnnouncement(Integer id) throws StatusFailException {
-        if(id == null) {
-            throw new StatusFailException("id为空");
-        }
-        if(id <= 0) {
+        if (id == null || id <= 0) {
             throw new StatusFailException("参数错误");
         }
         return ResultUtils.success(announcementMapper.selectAnnouncementContentVO(id));
+    }
+
+    @Override
+    public BaseResponse<AnnouncementContentVO> getLastAnnouncement() {
+        return ResultUtils.success(announcementMapper.selectLatestAnnouncementContentVO());
     }
 }
 

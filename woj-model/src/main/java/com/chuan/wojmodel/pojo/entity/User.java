@@ -9,13 +9,13 @@ import java.io.Serializable;
 import java.util.Date;
 
 @Data
-@TableName(value = "user_info")
+@TableName(value = "user")
 public class User implements Serializable {
     /**
      * UUID
      */
     @TableId
-    private String uuid;
+    private String id;
 
     /**
      * 微信开放平台id
@@ -45,7 +45,7 @@ public class User implements Serializable {
     /**
      * 简介
      */
-    private String userProfile;
+    private String profile;
 
     /**
      * 学校

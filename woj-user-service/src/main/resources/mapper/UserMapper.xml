@@ -5,13 +5,13 @@
 <mapper namespace="com.chuan.wojuserservice.mapper.UserMapper">
 
     <resultMap id="BaseResultMap" type="com.chuan.wojmodel.pojo.entity.User">
-            <id property="uuid" column="uuid" jdbcType="VARCHAR"/>
+            <id property="id" column="uuid" jdbcType="VARCHAR"/>
             <result property="unionid" column="unionId" jdbcType="VARCHAR"/>
             <result property="mpopenid" column="mpOpenId" jdbcType="VARCHAR"/>
             <result property="userAccount" column="userAccount" jdbcType="VARCHAR"/>
             <result property="userPassword" column="userPassword" jdbcType="VARCHAR"/>
             <result property="userName" column="userName" jdbcType="VARCHAR"/>
-            <result property="userProfile" column="userProfile" jdbcType="VARCHAR"/>
+            <result property="profile" column="userProfile" jdbcType="VARCHAR"/>
             <result property="school" column="school" jdbcType="VARCHAR"/>
             <result property="course" column="course" jdbcType="VARCHAR"/>
             <result property="number" column="number" jdbcType="VARCHAR"/>
@@ -29,9 +29,9 @@
     </resultMap>
 
     <sql id="Base_Column_List">
-        uuid,unionId,mpOpenId,
+        id,unionId,mpOpenId,
         userAccount,password,userName,
-        userProfile,school,course,
+        profile,school,course,
         number,gender,github,
         blog,avatar,signature,
         title_name,title_color,status,
