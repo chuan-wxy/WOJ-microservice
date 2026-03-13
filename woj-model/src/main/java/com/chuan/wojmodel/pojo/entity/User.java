@@ -98,11 +98,6 @@ public class User implements Serializable {
     private String titleColor;
 
     /**
-     * 0可用，1不可用
-     */
-    private Integer status;
-
-    /**
      * 创建时间
      */
     private Date createTime;

@@ -22,7 +22,6 @@
             <result property="signature" column="signature" jdbcType="VARCHAR"/>
             <result property="titleName" column="title_name" jdbcType="VARCHAR"/>
             <result property="titleColor" column="title_color" jdbcType="VARCHAR"/>
-            <result property="status" column="status" jdbcType="INTEGER"/>
             <result property="createTime" column="createTime" jdbcType="TIMESTAMP"/>
             <result property="updateTime" column="updateTime" jdbcType="TIMESTAMP"/>
             <result property="isDelete" column="isDelete" jdbcType="TINYINT"/>
@@ -34,7 +33,7 @@
         profile,school,course,
         number,gender,github,
         blog,avatar,signature,
-        title_name,title_color,status,
+        title_name,title_color,
         createTime,updateTime,isDelete
     </sql>
 </mapper>
