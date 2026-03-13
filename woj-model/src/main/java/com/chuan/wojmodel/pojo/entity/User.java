@@ -65,7 +65,7 @@ public class User implements Serializable {
     /**
      * 性别
      */
-    private String gender;
+    private Integer gender;
 
     /**
      * github地址

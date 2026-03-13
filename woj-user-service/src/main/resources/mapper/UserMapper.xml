@@ -15,7 +15,7 @@
             <result property="school" column="school" jdbcType="VARCHAR"/>
             <result property="course" column="course" jdbcType="VARCHAR"/>
             <result property="number" column="number" jdbcType="VARCHAR"/>
-            <result property="gender" column="gender" jdbcType="VARCHAR"/>
+            <result property="gender" column="gender" jdbcType="TINYINT"/>
             <result property="github" column="github" jdbcType="VARCHAR"/>
             <result property="blog" column="blog" jdbcType="VARCHAR"/>
             <result property="avatar" column="avatar" jdbcType="VARCHAR"/>
