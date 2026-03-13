@@ -2,6 +2,8 @@ package com.chuan.wojuserservice.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.chuan.wojcommon.common.BaseResponse;
+import com.chuan.wojcommon.exception.StatusFailException;
+import com.chuan.wojmodel.pojo.dto.user.UserSearchDTO;
 import com.chuan.wojmodel.pojo.vo.user.UserAdminVO;
 import com.chuan.wojmodel.pojo.vo.user.UserVO;
 import com.chuan.wojuserservice.service.AdminService;
@@ -25,40 +27,21 @@ import java.util.List;
 public class AdminController {
     @Autowired
     AdminService adminService;
-    /**
-     * 根据id查询用户
-     * @param uuid
-     * @return
-     */
-    @GetMapping("/search-by-uuid")
-    public BaseResponse<UserVO> searchUserById(String uuid) {
-        return adminService.searchUserById(uuid);
-    }
-
-    /**
-     * 根据性别查询用户
-     * @param gender
-     * @return
-     */
-    @GetMapping("/search-list-by-gender")
-    public BaseResponse<List<UserVO>> searchUserByGender(String gender) {
-        return adminService.searchUserByGneder(gender);
-    }
 
     /**
      * 根据uuid删除用户
-     * @param uuid
+     * @param id
      * @return
      */
     @GetMapping("/delete-by-uuid")
-    public BaseResponse<Void> deleteUserByid(@RequestParam(value = "id")String uuid, HttpServletRequest request) {
-        return adminService.deleteUserByid(uuid, request);
+    public BaseResponse<Void> deleteUserByid(@RequestParam(value = "id")String id, HttpServletRequest request) {
+        return adminService.deleteUserByid(id, request);
     }
 
     // 查找用户
-    @GetMapping("/user-list")
-    public BaseResponse<Page<UserAdminVO>> getUserList() {
-        return adminService.getUserList();
+    @PostMapping("/user-list")
+    public BaseResponse<Page<UserAdminVO>> getUserList(@RequestBody UserSearchDTO userSearchDTO) throws StatusFailException {
+        return adminService.getUserList(userSearchDTO);
     }
 
 }

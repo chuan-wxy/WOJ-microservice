@@ -1,12 +1,16 @@
 package com.chuan.wojuserservice.service.impl;
+import java.util.Date;
 
 import cn.hutool.core.collection.CollUtil;
+import com.alibaba.cloud.commons.lang.StringUtils;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.chuan.wojcommon.common.BaseResponse;
+import com.chuan.wojcommon.exception.StatusFailException;
 import com.chuan.wojcommon.utils.ResultUtils;
+import com.chuan.wojmodel.pojo.dto.user.UserSearchDTO;
 import com.chuan.wojmodel.pojo.entity.Problem;
 import com.chuan.wojmodel.pojo.entity.User;
 import com.chuan.wojmodel.pojo.vo.problem.ProblemTitleVO;
@@ -38,42 +42,6 @@ public class AdminServiceImpl extends ServiceImpl<UserMapper, User> implements A
     @Autowired
     UserService userService;
 
-    @Override
-    public BaseResponse<UserVO> searchUserById(String uuid) {
-        if (uuid == null) {
-            log.info("查询失败");
-            return ResultUtils.error("查询失败");
-        }
-
-        User user = userMapper.selectById(uuid);
-
-        if (user == null) {
-            return ResultUtils.error("没有找到该用户");
-        }
-
-        UserVO userVO = new UserVO();
-
-        BeanUtils.copyProperties(user,userVO);
-        return ResultUtils.success(userVO);
-    }
-
-    @Override
-    public BaseResponse<List<UserVO>> searchUserByGneder(String gender) {
-        Set<String> allowedGenders = new HashSet<>(Arrays.asList("男", "女", "保密"));
-
-        if (!allowedGenders.contains(gender)) {
-            return ResultUtils.error("请输入：男、女或保密");
-        }
-        QueryWrapper queryWrapper = new QueryWrapper<User>();
-        queryWrapper.eq("gender",gender);
-
-        List<User> list = userMapper.selectList(queryWrapper);
-        List<UserVO> userVOList = new ArrayList<UserVO>();
-        BeanUtils.copyProperties(list,userVOList);
-
-        return ResultUtils.success(userVOList);
-    }
-
     /**
      * 根据uuid删除用户
      * @param id
@@ -93,9 +61,28 @@ public class AdminServiceImpl extends ServiceImpl<UserMapper, User> implements A
     }
 
     @Override
-    public BaseResponse<Page<UserAdminVO>> getUserList() {
+    public BaseResponse<Page<UserAdminVO>> getUserList(UserSearchDTO userSearchDTO) throws StatusFailException {
+        if (userSearchDTO == null) throw new StatusFailException("参数错误");
 
-        Page<User> page = this.page(new Page<>(1, 10));
+        String id = userSearchDTO.getId();
+        String userAccount = userSearchDTO.getUserAccount();
+        String userName = userSearchDTO.getUserName();
+        String school = userSearchDTO.getSchool();
+        String number = userSearchDTO.getNumber();
+        Integer gender = userSearchDTO.getGender();
+        Integer isDelete = userSearchDTO.getIsDelete();
+
+        LambdaQueryWrapper<User> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper
+                .eq(StringUtils.isNotBlank(id), User::getId, id)
+                .eq(StringUtils.isNotBlank(userAccount), User::getUserAccount, userAccount)
+                .like(StringUtils.isNotBlank(userName), User::getUserName, userName)
+                .like(StringUtils.isNotBlank(school), User::getSchool, school)
+                .eq(StringUtils.isNotBlank(number), User::getNumber, number)
+                .eq(gender != null, User::getGender, gender)
+                .eq(isDelete != null, User::getIsDelete, isDelete);
+
+        Page<User> page = this.page(new Page<>(1, 10), lambdaQueryWrapper);
 
         List<User> userList = page.getRecords();
 
@@ -115,10 +102,6 @@ public class AdminServiceImpl extends ServiceImpl<UserMapper, User> implements A
         }).collect(Collectors.toList());
 
         userAdminVOPage.setRecords(userAdminVOList);
-
-        for(UserAdminVO item : userAdminVOList) {
-            System.out.println(item.getId());
-        }
 
         return ResultUtils.success(userAdminVOPage);
     }

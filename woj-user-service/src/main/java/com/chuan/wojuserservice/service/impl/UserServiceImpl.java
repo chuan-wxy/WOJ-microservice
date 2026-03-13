@@ -144,9 +144,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         User user = getUser(userAccount, userPassword);
 
         if(user!=null) {
-            if (user.getStatus() != 0) {
-                return new BaseResponse(400,"账号已被封禁，请联系管理员处理");
-            }
             UserLoginVO userLoginVO = new UserLoginVO();
             UserVO userVO = new UserVO();
 
