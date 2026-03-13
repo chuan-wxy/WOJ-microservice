@@ -17,7 +17,7 @@ public class ResultUtils {
      * @param <T>
      */
     public static<T> BaseResponse<T> success(){
-        return new BaseResponse<>(0, "success", null);
+        return new BaseResponse<>(200, "success", null);
     }
 
     /**
@@ -25,7 +25,7 @@ public class ResultUtils {
      * @return
      */
     public static<T> BaseResponse<T> success(T data){
-        return new BaseResponse<>(0, "success", data);
+        return new BaseResponse<>(200, "success", data);
     }
 
     /**
@@ -34,7 +34,7 @@ public class ResultUtils {
      * @return
      */
     public static<T> BaseResponse<T> success(String message, T data){
-        return new BaseResponse<>(0, message, data);
+        return new BaseResponse<>(200, message, data);
     }
 
     /**

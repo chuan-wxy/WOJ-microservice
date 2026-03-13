@@ -1,8 +1,8 @@
 package com.chuan.wojmodel.pojo.dto.user;
 
-import com.baomidou.mybatisplus.annotation.TableField;
 import lombok.Data;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -65,7 +65,7 @@ public class UserProfileDTO implements Serializable {
      */
     private String signature;
 
-    @TableField(exist = false)
+    @Serial
     private static final long serialVersionUID = 1L;
 
 }

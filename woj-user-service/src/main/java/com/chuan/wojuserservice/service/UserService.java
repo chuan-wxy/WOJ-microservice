@@ -3,10 +3,7 @@ package com.chuan.wojuserservice.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.chuan.wojcommon.common.BaseResponse;
 import com.chuan.wojcommon.exception.StatusFailException;
-import com.chuan.wojmodel.pojo.dto.user.UserLoginDTO;
-import com.chuan.wojmodel.pojo.dto.user.UserLogoutDTO;
-import com.chuan.wojmodel.pojo.dto.user.UserProfileDTO;
-import com.chuan.wojmodel.pojo.dto.user.UserRegisterDTO;
+import com.chuan.wojmodel.pojo.dto.user.*;
 import com.chuan.wojmodel.pojo.entity.User;
 import com.chuan.wojmodel.pojo.vo.user.UserLoginVO;
 import jakarta.servlet.http.HttpServletRequest;
@@ -32,6 +29,8 @@ public interface UserService extends IService<User> {
     BaseResponse<Void> getLogoutCode(UserLogoutDTO userLogoutDTO);
 
     BaseResponse<Void> logoutForever(UserLogoutDTO userLogoutDTO);
+
+    BaseResponse<Void> editPassword(UserPasswordDTO userPasswordDTO, HttpServletRequest request) throws StatusFailException;
 
     BaseResponse<List<String>> getUserRole(String userAccount);
 

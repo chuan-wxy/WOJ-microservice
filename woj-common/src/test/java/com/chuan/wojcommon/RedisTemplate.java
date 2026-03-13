@@ -1,6 +1,6 @@
 package com.chuan.wojcommon;
 
-import com.chuan.wojcommon.utils.RedisUtil;
+import com.chuan.wojcommon.utils.RedisUtils;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -9,11 +9,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 public class RedisTemplate {
 
     @Resource
-    private RedisUtil redisUtil;
+    private RedisUtils redisUtils;
     @Test
     public void test() {
-        redisUtil.set("key", "value");
-        String s = (String) redisUtil.get("key");
+        redisUtils.set("key", "value");
+        String s = (String) redisUtils.get("key");
         System.out.println(s);
     }
 }

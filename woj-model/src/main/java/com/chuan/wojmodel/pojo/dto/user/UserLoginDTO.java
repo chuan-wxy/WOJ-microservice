@@ -1,7 +1,9 @@
 package com.chuan.wojmodel.pojo.dto.user;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -12,9 +14,10 @@ import java.io.Serializable;
  * @Description:
  */
 @Data
-public class UserLoginDTO implements Serializable {
+public class UserLoginDTO {
+    @NotBlank(message = "账号不能为空")
     private String userAccount;
 
+    @NotBlank(message = "密码不能为空")
     private String userPassword;
-
 }

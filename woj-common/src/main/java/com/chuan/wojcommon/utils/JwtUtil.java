@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -32,14 +33,14 @@ public class JwtUtil {
      * @param userAccount
      * @return
      */
-    public static String generateJwt(String userAccount) {
+    public static String generateJwt(String userAccount, List<String> roles) {
         Date nowDate = new Date();
 
         Date expireDate = new Date(nowDate.getTime() + staticExpire );
 
-
         Map<String,Object> claims = new HashMap<>();
         claims.put("userAccount", userAccount);
+        claims.put("roles", roles);
 
         String token = Jwts.builder()
                 .setHeaderParam("type", "JWT")

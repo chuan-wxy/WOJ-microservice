@@ -2,6 +2,9 @@ package com.chuan.wojmodel.pojo.dto.user;
 
 import lombok.Data;
 
+import java.io.Serial;
+import java.io.Serializable;
+
 /**
  * 用户注册DTO
  *
@@ -10,7 +13,7 @@ import lombok.Data;
  * @Description:
  */
 @Data
-public class UserRegisterDTO {
+public class UserRegisterDTO implements Serializable {
 
     private String userAccount;
 
@@ -19,5 +22,8 @@ public class UserRegisterDTO {
     private String rePassword;
 
     private String captcha;
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
 }

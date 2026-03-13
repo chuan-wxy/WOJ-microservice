@@ -1,11 +1,10 @@
 package com.chuan.wojcommon.utils;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.annotation.Resource;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 
-import java.util.Collection;
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -14,20 +13,15 @@ import java.util.concurrent.TimeUnit;
  * @Description:
  */
 @Component
-public class RedisUtil {
+public class RedisUtils {
 
-    private static RedisTemplate<String, Object> redisTemplate;
+    @Resource
+    private RedisTemplate<String, Object> redisTemplate;
 
-    @Autowired
-    public void setRedisTemplate(RedisTemplate redisTemplate) {
-        RedisUtil.redisTemplate = redisTemplate;
-    }
-
-    public static boolean hasKey(String key) {
+    public boolean hasKey(String key) {
         try {
             return redisTemplate.hasKey(key);
         } catch (Exception e) {
-            e.printStackTrace();
             return false;
         }
     }
@@ -42,17 +36,16 @@ public class RedisUtil {
         return redisTemplate.getExpire(key, TimeUnit.SECONDS);
     }
 
-    public static boolean set(String key, Object value) {
+    public boolean set(String key, Object value) {
         try {
             redisTemplate.opsForValue().set(key, value);
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
             return false;
         }
     }
 
-    public static boolean set(String key, Object value, long time) {
+    public boolean set(String key, Object value, long time) {
         try {
             if (time > 0) {
                 redisTemplate.opsForValue().set(key, value, time, TimeUnit.SECONDS);
@@ -61,7 +54,6 @@ public class RedisUtil {
             }
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
             return false;
         }
     }
@@ -72,7 +64,7 @@ public class RedisUtil {
      * @param key 键
      * @return 值
      */
-    public static Object get(String key) {
+    public Object get(String key) {
         return key == null ? null : redisTemplate.opsForValue().get(key);
     }
 
@@ -81,17 +73,13 @@ public class RedisUtil {
      *
      * @param key 可以传一个值 或多个
      */
-    @SuppressWarnings("unchecked")
-    public static void del(String... key) {
+    public void del(String... key) {
         if (key != null && key.length > 0) {
             if (key.length == 1) {
-                try {
-                    redisTemplate.delete(key[0]);
-                }catch (Exception e) {
-                    throw new RuntimeException();
-                }
+                redisTemplate.delete(key[0]);
             } else {
-                redisTemplate.delete((Collection<String>) CollectionUtils.arrayToList(key));
+                // Arrays.asList 明确知道自己转出来的是 List<String>
+                redisTemplate.delete(Arrays.asList(key));
             }
         }
     }

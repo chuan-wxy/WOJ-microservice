@@ -1,13 +1,14 @@
 package com.chuan.wojuserservice.controller;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.chuan.wojcommon.common.BaseResponse;
+import com.chuan.wojmodel.pojo.vo.user.UserAdminVO;
 import com.chuan.wojmodel.pojo.vo.user.UserVO;
 import com.chuan.wojuserservice.service.AdminService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -20,7 +21,7 @@ import java.util.List;
  */
 @Slf4j
 @RestController
-@RequestMapping("/amdin")
+@RequestMapping("/admin")
 public class AdminController {
     @Autowired
     AdminService adminService;
@@ -50,7 +51,14 @@ public class AdminController {
      * @return
      */
     @GetMapping("/delete-by-uuid")
-    public BaseResponse<Void> deleteUserByUuid(String uuid) {
-        return adminService.deleteUserByUuid(uuid);
+    public BaseResponse<Void> deleteUserByid(@RequestParam(value = "id")String uuid, HttpServletRequest request) {
+        return adminService.deleteUserByid(uuid, request);
     }
+
+    // 查找用户
+    @GetMapping("/user-list")
+    public BaseResponse<Page<UserAdminVO>> getUserList() {
+        return adminService.getUserList();
+    }
+
 }

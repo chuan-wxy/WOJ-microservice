@@ -5,7 +5,7 @@ import com.chuan.wojcommon.common.BaseResponse;
 import com.chuan.wojcommon.common.ResultStatus;
 import com.chuan.wojcommon.constant.RedisContant;
 import com.chuan.wojcommon.utils.JwtUtil;
-import com.chuan.wojcommon.utils.RedisUtil;
+import com.chuan.wojcommon.utils.RedisUtils;
 import com.chuan.wojgateway.UrlAuthProperties;
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
@@ -42,7 +42,7 @@ public class GlobalAuthFilter implements GlobalFilter, Ordered{
     private UrlAuthProperties urlAuthProperties;
 
     @Autowired
-    private RedisUtil redisUtil;
+    private RedisUtils redisUtils;
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
@@ -57,6 +57,8 @@ public class GlobalAuthFilter implements GlobalFilter, Ordered{
         // 获取jwt令牌
         HttpHeaders headers = request.getHeaders();
         String token = headers.getFirst("Authorization");
+        System.out.println("Token:" + token);
+        System.out.println("Current Path: " + path);
 
         // 判断路径是否包含inner
         if(antPathMatcher.match("/**/inner/**", path)) {
@@ -71,7 +73,7 @@ public class GlobalAuthFilter implements GlobalFilter, Ordered{
         }
 
         // 获取 redis 中的登记信息
-        Object userAccount = RedisUtil.get(RedisContant.USER_TOKEN + token);
+        Object userAccount = redisUtils.get(RedisContant.USER_TOKEN + token);
 
         //验证 token （ token 为空或 redis 中不存在登记信息）
         if (token == null || token.isBlank() || userAccount == null) {
@@ -82,13 +84,18 @@ public class GlobalAuthFilter implements GlobalFilter, Ordered{
 
         // 需要管理员权限
         if(antPathMatcher.match("/**/admin/**", path)) {
+            System.out.println("访问管理员接口："+path);
             Claims claimByToken = JwtUtil.getClaimByToken(token);
 
             System.out.println(claimByToken);
 
-            response.setStatusCode(HttpStatus.FORBIDDEN);
-            DataBuffer dataBuffer = dataBufferFactory.wrap("无权限".getBytes(StandardCharsets.UTF_8));
-            return response.writeWith(Mono.just(dataBuffer));
+            List<String> roles = claimByToken.get("roles", List.class);
+
+            if (roles == null || !roles.contains("root")) {
+                response.setStatusCode(HttpStatus.FORBIDDEN);
+                DataBuffer dataBuffer = dataBufferFactory.wrap("无权限".getBytes(StandardCharsets.UTF_8));
+                return response.writeWith(Mono.just(dataBuffer));
+            }
         }
         return chain.filter(exchange);
     }

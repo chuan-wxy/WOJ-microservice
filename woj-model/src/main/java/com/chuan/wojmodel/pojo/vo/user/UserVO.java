@@ -1,9 +1,12 @@
 package com.chuan.wojmodel.pojo.vo.user;
 
 import com.baomidou.mybatisplus.annotation.*;
+import com.chuan.wojmodel.pojo.entity.User;
 import lombok.Data;
+import org.springframework.beans.BeanUtils;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -18,7 +21,7 @@ public class UserVO implements Serializable {
     /**
      * 用户id
      */
-    private Long id;
+    private String id;
 
     /**
      * 账号
@@ -38,7 +41,7 @@ public class UserVO implements Serializable {
     /**
      * 用户简介
      */
-    private String userProfile;
+    private String profile;
 
     /**
      * 学校
@@ -93,12 +96,18 @@ public class UserVO implements Serializable {
     /**
      * 创建时间
      */
-    private Data createTime;
+    private Date createTime;
 
     /**
      * iserialVersionUID
      */
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
+
+    public static UserVO objToVo(User user) {
+        UserVO userVO = new UserVO();
+        BeanUtils.copyProperties(user, userVO);
+        return userVO;
+    }
 
 }

@@ -27,7 +27,7 @@
     <select id="selectLatestAnnouncementContentVO" resultType="com.chuan.wojmodel.pojo.vo.announcement.AnnouncementContentVO">
         SELECT id,title,content,createTime
         FROM announcement
-        ORDER BY create_time DESC
+        ORDER BY createTime DESC
         LIMIT 1
     </select>
 </mapper>

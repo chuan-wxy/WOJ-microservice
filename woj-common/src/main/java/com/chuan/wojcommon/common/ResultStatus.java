@@ -8,7 +8,6 @@ package com.chuan.wojcommon.common;
  */
 
 public enum ResultStatus {
-
     OK(200,"OK"),
     CREATED(201, "Created"),
     ACCEPTED(202,  "Accepted"),

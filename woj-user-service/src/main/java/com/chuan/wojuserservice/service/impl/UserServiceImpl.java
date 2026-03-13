@@ -5,6 +5,7 @@ import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.crypto.SecureUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -14,12 +15,9 @@ import com.chuan.wojcommon.constant.RedisContant;
 import com.chuan.wojcommon.exception.StatusFailException;
 import com.chuan.wojcommon.utils.EmailUtil;
 import com.chuan.wojcommon.utils.JwtUtil;
-import com.chuan.wojcommon.utils.RedisUtil;
+import com.chuan.wojcommon.utils.RedisUtils;
 import com.chuan.wojcommon.utils.ResultUtils;
-import com.chuan.wojmodel.pojo.dto.user.UserLoginDTO;
-import com.chuan.wojmodel.pojo.dto.user.UserLogoutDTO;
-import com.chuan.wojmodel.pojo.dto.user.UserProfileDTO;
-import com.chuan.wojmodel.pojo.dto.user.UserRegisterDTO;
+import com.chuan.wojmodel.pojo.dto.user.*;
 import com.chuan.wojmodel.pojo.entity.User;
 import com.chuan.wojmodel.pojo.entity.UserRole;
 import com.chuan.wojmodel.pojo.vo.user.UserLoginVO;
@@ -57,7 +55,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     private RoleMapper roleMapper;
 
     @Autowired
-    private RedisUtil redisUtil;
+    private RedisUtils redisUtils;
 
     /**
      * 用户注册
@@ -74,7 +72,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         String rePassword = userAddDTO.getRePassword();
         String captcha = userAddDTO.getCaptcha();
 
-        String redisCaptcha = (String) redisUtil.get(EmailEnum.REGISTER_KEY_PREFIX.getValue() + userAccount);
+        String redisCaptcha = (String) redisUtils.get(EmailEnum.REGISTER_KEY_PREFIX.getValue() + userAccount);
 
         if (!captcha.equals(redisCaptcha)) {
             log.info(userAccount + "注册时验证码有误");
@@ -88,7 +86,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             log.info(userAccount + "注册时验证码有误");
             return new BaseResponse(400, "密码不能为空");
         }
-        if (userPassword.length() < 6 || userPassword.length() > 20) {
+        if (userPassword.length() < 8 || userPassword.length() > 20) {
             return new BaseResponse(400, "密码长度应为6-20位");
         }
 
@@ -129,28 +127,21 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      * 用户登录
      *
      * @param userLoginDTO
-     * @return
+     * @return UserLoginVO
      */
     @Override
     public BaseResponse<UserLoginVO> login(UserLoginDTO userLoginDTO, HttpServletRequest request) {
         String userAccount = userLoginDTO.getUserAccount();
         String userPassword = userLoginDTO.getUserPassword();
 
-        if (StringUtils.isAnyBlank(userAccount, userPassword)) {
-            return ResultUtils.error(400, "账户密码不能为空");
-        }
-
         String key = RedisContant.TRY_LOGIN_NUM + userAccount;
-        Integer tryLoginCount = (Integer) redisUtil.get(key);
+        Integer tryLoginCount = (Integer) redisUtils.get(key);
+
         if(tryLoginCount != null && tryLoginCount >= 5) {
             return new BaseResponse(400,"登录失败次数过多！您的账号有风险，半个小时内暂时无法登录！");
         }
 
-        String md5Password = SecureUtil.md5().digestHex((SALT + userPassword).getBytes());
-
-        QueryWrapper<User> queryWrapper = new QueryWrapper();
-        queryWrapper.eq("userAccount", userAccount).eq("userPassword", md5Password);
-        User user = userMapper.selectOne(queryWrapper);
+        User user = getUser(userAccount, userPassword);
 
         if(user!=null) {
             if (user.getStatus() != 0) {
@@ -164,26 +155,26 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
             // 登陆成功清楚异常记录
             if (tryLoginCount != null) {
-                redisUtil.del(key);
+                redisUtils.del(key);
             }
 
-            String JWT = JwtUtil.generateJwt(userAccount);
+            String JWT = JwtUtil.generateJwt(userAccount, getUserRole(userAccount).getData());
             userLoginVO.setJwt(JWT);
 
             List<String> userRoleList = getUserRole(userAccount).getData();
             userLoginVO.getUserInfo().setRoles(userRoleList);
 
             // 时间与 JWT 令牌的时间相同（3天）
-            redisUtil.set(RedisContant.USER_TOKEN + JWT, userAccount,72*60*60);
+            redisUtils.set(RedisContant.USER_TOKEN + JWT, userAccount,72*60*60);
 
             request.getSession().setAttribute("user_login", user);
 
             return ResultUtils.success(userLoginVO);
         } else {
             if(tryLoginCount == null) {
-                redisUtil.set(key, 1,30*60);
+                redisUtils.set(key, 1,30*60);
             } else {
-                redisUtil.set(key,tryLoginCount+1,30*60);
+                redisUtils.set(key,tryLoginCount+1,30*60);
             }
             return ResultUtils.error(400,"账号与密码不匹配！");
         }
@@ -254,18 +245,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      */
     @Override
     public BaseResponse<Void> logout(HttpServletRequest request) {
-
         String token = String.valueOf(request.getHeader("Authorization"));
 
-        if(token==null) {
-            log.info("Jwt为空");
-            return ResultUtils.success();
-        }
+        redisUtils.del(RedisContant.USER_TOKEN + token);
 
-        if(RedisUtil.get(RedisContant.USER_TOKEN + token) == null) {
-            return ResultUtils.success();
-        }
-        RedisUtil.del(RedisContant.USER_TOKEN + token);
         return ResultUtils.success();
     }
 
@@ -284,8 +267,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
 
         String lockKey = EmailEnum.REGISTER_EMAIL_LOCK.getValue() + userAccount;
-        if(redisUtil.hasKey(lockKey)) {
-            return new BaseResponse(400,"对不起，您的操作频率过快，请在" + redisUtil.getExpire(lockKey) + "秒后再次发送注册邮件！");
+        if(redisUtils.hasKey(lockKey)) {
+            return new BaseResponse(400,"对不起，您的操作频率过快，请在" + redisUtils.getExpire(lockKey) + "秒后再次发送注册邮件！");
         }
 
         QueryWrapper<User> queryWrapper = new QueryWrapper<User>();
@@ -298,8 +281,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
         String numbers = RandomUtil.randomNumbers(6);
 
-        redisUtil.set(EmailEnum.LOGOUT_KEY_PREFIX.getValue() + userAccount, numbers, 10 * 60);//默认验证码有效10分钟
-        redisUtil.set(lockKey, 0, 60);
+        redisUtils.set(EmailEnum.LOGOUT_KEY_PREFIX.getValue() + userAccount, numbers, 10 * 60);//默认验证码有效10分钟
+        redisUtils.set(lockKey, 0, 60);
 
         try {
             EmailUtil.send(userAccount,numbers,"正在修改注销账号，若非本人操作，请立即修改密码");
@@ -322,19 +305,19 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         String userAccount = userLogoutDTO.getUserAccount();
         String code = userLogoutDTO.getCode();
 
-        Integer tryLogoutNum = (Integer) redisUtil.get(RedisContant.TRY_LOGIN_NUM + userAccount);
+        Integer tryLogoutNum = (Integer) redisUtils.get(RedisContant.TRY_LOGIN_NUM + userAccount);
 
         if(tryLogoutNum != null && tryLogoutNum > 3) {
             log.info("{}多次注销，异常行为被拦截",userAccount);
             return ResultUtils.error("用户异常，请30分钟后再试！");
         }
 
-        String redisKey = (String) redisUtil.get(EmailEnum.LOGOUT_KEY_PREFIX.getValue() + userAccount);
+        String redisKey = (String) redisUtils.get(EmailEnum.LOGOUT_KEY_PREFIX.getValue() + userAccount);
         if(!redisKey.equals(code)) {
             if (tryLogoutNum != null) {
-                redisUtil.set(RedisContant.TRY_LOGIN_NUM + userAccount, tryLogoutNum + 1, 30 * 60);
+                redisUtils.set(RedisContant.TRY_LOGIN_NUM + userAccount, tryLogoutNum + 1, 30 * 60);
             } else {
-                redisUtil.set(RedisContant.TRY_LOGIN_NUM + userAccount, 1, 30 * 60);
+                redisUtils.set(RedisContant.TRY_LOGIN_NUM + userAccount, 1, 30 * 60);
             }
             return ResultUtils.error("验证码错误");
         }
@@ -350,12 +333,52 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
+    public BaseResponse<Void> editPassword(UserPasswordDTO userPasswordDTO, HttpServletRequest request) throws StatusFailException {
+        String newPassword = userPasswordDTO.getNewPassword();
+        String confirmPassword = userPasswordDTO.getConfirmPassword();
+        String oldPassword = userPasswordDTO.getPassword();
+
+        // 校验两次新密码是否一致
+        if (!newPassword.equals(confirmPassword)) {
+            throw new StatusFailException("两次输入的密码不一致");
+        }
+
+        String token = request.getHeader("Authorization");
+
+        String redisKey = RedisContant.USER_TOKEN + token;
+        String userAccount = (String) redisUtils.get(redisKey);
+        if (userAccount == null) {
+            throw new StatusFailException("会话已过期，请重新登录");
+        }
+
+        // 校验旧密码是否正确
+
+        User user = getUser(userAccount, oldPassword);
+        if (user == null) {
+            throw new StatusFailException("原密码错误");
+        }
+
+        // 设置新密码
+        String encryptedNewPassword = SecureUtil.md5().digestHex((SALT + newPassword).getBytes());
+        user.setUserPassword(encryptedNewPassword);
+
+        boolean success = this.updateById(user);
+        if (!success) {
+            throw new StatusFailException("系统繁忙，修改失败");
+        }
+
+        // 修改成功后，删除旧 Token，强制用户重新登录
+        redisUtils.del(redisKey);
+
+        return ResultUtils.success();
+    }
+
+    @Override
     public BaseResponse<List<String>> getUserRole(String userAccount) {
         if(userAccount.isBlank()) {
             log.info("获取角色时参数为空");
             return ResultUtils.error("参数为空");
         }
-        System.out.println(roleMapper.SelectRoleByUserAccount(userAccount));
         return ResultUtils.success(roleMapper.SelectRoleByUserAccount(userAccount));
     }
 
@@ -404,7 +427,23 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public BaseResponse<Boolean> checkJWT(String JWT) {
         log.debug("UserServiceImpl---->checkJWT()");
-        return ResultUtils.success(!redisUtil.hasKey(JWT));
+        return ResultUtils.success(!redisUtils.hasKey(JWT));
+    }
+
+    /**
+     * 根据用户账号密码返回用户
+     *
+     * @param userAccount
+     * @param userPassword
+     * @return User
+     */
+    private User getUser(String userAccount, String userPassword) {
+        String md5Password = SecureUtil.md5().digestHex((SALT + userPassword).getBytes());
+
+        LambdaQueryWrapper<User> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(User::getUserAccount, userAccount).eq(User::getUserPassword, md5Password);
+
+        return userMapper.selectOne(lambdaQueryWrapper);
     }
 
 }

@@ -7,7 +7,7 @@ import com.chuan.wojcommon.common.BaseResponse;
 import com.chuan.wojcommon.common.ResultStatus;
 import com.chuan.wojcommon.common.enums.EmailEnum;
 import com.chuan.wojcommon.utils.EmailUtil;
-import com.chuan.wojcommon.utils.RedisUtil;
+import com.chuan.wojcommon.utils.RedisUtils;
 import com.chuan.wojcommon.utils.ResultUtils;
 import com.chuan.wojmodel.pojo.entity.User;
 import com.chuan.wojuserservice.service.EmailService;
@@ -29,7 +29,7 @@ public class EmailServiceImpl implements EmailService {
     UserService userService;
 
     @Autowired
-    RedisUtil redisUtil;
+    RedisUtils redisUtils;
 
     private static final Logger log = LoggerFactory.getLogger(EmailServiceImpl.class);
 
@@ -42,8 +42,8 @@ public class EmailServiceImpl implements EmailService {
         }
 
         String lockKey = EmailEnum.REGISTER_EMAIL_LOCK + email;
-        if(redisUtil.hasKey(lockKey)) {
-            return new BaseResponse(400,"对不起，您的操作频率过快，请在" + redisUtil.getExpire(lockKey) + "秒后再次发送注册邮件！");
+        if(redisUtils.hasKey(lockKey)) {
+            return new BaseResponse(400,"对不起，您的操作频率过快，请在" + redisUtils.getExpire(lockKey) + "秒后再次发送注册邮件！");
         }
 
         QueryWrapper<User> queryWrapper = new QueryWrapper<User>();
@@ -57,8 +57,8 @@ public class EmailServiceImpl implements EmailService {
 
         String numbers = RandomUtil.randomNumbers(6);
 
-        redisUtil.set(EmailEnum.REGISTER_KEY_PREFIX.getValue() + email, numbers, 10 * 60);//默认验证码有效10分钟
-        redisUtil.set(lockKey, 0, 60);
+        redisUtils.set(EmailEnum.REGISTER_KEY_PREFIX.getValue() + email, numbers, 10 * 60);//默认验证码有效10分钟
+        redisUtils.set(lockKey, 0, 60);
         log.info(email+"正在发送验证码");
         if(EmailUtil.send(email,numbers,content)) {
             log.info(email+"验证码发送成功");
