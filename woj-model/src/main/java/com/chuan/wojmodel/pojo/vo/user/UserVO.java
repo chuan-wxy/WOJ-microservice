@@ -61,7 +61,7 @@ public class UserVO implements Serializable {
     /**
      * 性别
      */
-    private String gender;
+    private Integer gender;
 
     /**
      * github地址
