@@ -15,6 +15,6 @@ import java.util.List;
 @Mapper
 public interface RoleMapper extends BaseMapper<Role> {
 
-    List<String> SelectRoleByUserAccount(String userAccount);
+    List<String> SelectRoleByUserAccount(String account);
 
 }

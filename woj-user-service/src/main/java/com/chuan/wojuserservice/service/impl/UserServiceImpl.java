@@ -101,20 +101,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         user = new User();
         BeanUtils.copyProperties(userAddDTO, user);
 
-        String uuid = IdUtil.simpleUUID();
-
-        user.setId(uuid);
-        user.setUserPassword(md5Password);
-
         int insertResult = userMapper.insert(user);
+
         if(insertResult == 0) {
             throw new StatusFailException("插入用户失败");
         }
 
         UserRole userRole = new UserRole();
 
-        userRole.setUid(uuid);
-        userRole.setRoleid(2);
+        userRole.setUid(user.getId());
+        // todo 常量
+        userRole.setRoleId(2);
 
         insertResult = userRoleMapper.insert(userRole);
         if(insertResult == 0) {
@@ -357,7 +354,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
         // 设置新密码
         String encryptedNewPassword = SecureUtil.md5().digestHex((SALT + newPassword).getBytes());
-        user.setUserPassword(encryptedNewPassword);
+        user.setPassword(encryptedNewPassword);
 
         boolean success = this.updateById(user);
         if (!success) {
@@ -386,11 +383,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
         User currentUser = (User) userObj;
 
-        if (currentUser == null || currentUser.getUserAccount() == null) {
+        if (currentUser == null || currentUser.getAccount() == null) {
             throw new StatusFailException("未登录");
         }
         // 从数据库查询（追求性能的话可以注释，直接走缓存）
-        String userId = currentUser.getId();
+        Long userId = currentUser.getId();
 
         currentUser = this.getById(userId);
         if (currentUser == null) {
@@ -438,7 +435,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         String md5Password = SecureUtil.md5().digestHex((SALT + userPassword).getBytes());
 
         LambdaQueryWrapper<User> lambdaQueryWrapper = new LambdaQueryWrapper<>();
-        lambdaQueryWrapper.eq(User::getUserAccount, userAccount).eq(User::getUserPassword, md5Password);
+        lambdaQueryWrapper.eq(User::getAccount, userAccount).eq(User::getPassword, md5Password);
 
         return userMapper.selectOne(lambdaQueryWrapper);
     }

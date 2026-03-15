@@ -21,17 +21,17 @@ public class UserVO implements Serializable {
     /**
      * 用户id
      */
-    private String id;
+    private Long id;
 
     /**
      * 账号
      */
-    private String userAccount;
+    private String account;
 
     /**
      * 用户名
      */
-    private String userName;
+    private String name;
 
     /**
      * 角色列表

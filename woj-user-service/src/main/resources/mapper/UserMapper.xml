@@ -5,35 +5,73 @@
 <mapper namespace="com.chuan.wojuserservice.mapper.UserMapper">
 
     <resultMap id="BaseResultMap" type="com.chuan.wojmodel.pojo.entity.User">
-            <id property="id" column="uuid" jdbcType="VARCHAR"/>
-            <result property="unionid" column="unionId" jdbcType="VARCHAR"/>
-            <result property="mpopenid" column="mpOpenId" jdbcType="VARCHAR"/>
-            <result property="userAccount" column="userAccount" jdbcType="VARCHAR"/>
-            <result property="userPassword" column="userPassword" jdbcType="VARCHAR"/>
-            <result property="userName" column="userName" jdbcType="VARCHAR"/>
-            <result property="profile" column="userProfile" jdbcType="VARCHAR"/>
-            <result property="school" column="school" jdbcType="VARCHAR"/>
-            <result property="course" column="course" jdbcType="VARCHAR"/>
-            <result property="number" column="number" jdbcType="VARCHAR"/>
-            <result property="gender" column="gender" jdbcType="TINYINT"/>
-            <result property="github" column="github" jdbcType="VARCHAR"/>
-            <result property="blog" column="blog" jdbcType="VARCHAR"/>
-            <result property="avatar" column="avatar" jdbcType="VARCHAR"/>
-            <result property="signature" column="signature" jdbcType="VARCHAR"/>
-            <result property="titleName" column="title_name" jdbcType="VARCHAR"/>
-            <result property="titleColor" column="title_color" jdbcType="VARCHAR"/>
-            <result property="createTime" column="createTime" jdbcType="TIMESTAMP"/>
-            <result property="updateTime" column="updateTime" jdbcType="TIMESTAMP"/>
-            <result property="isDelete" column="isDelete" jdbcType="TINYINT"/>
+        <id property="id" column="id" jdbcType="BIGINT"/>
+        <result property="unionId" column="union_id" jdbcType="VARCHAR"/>
+        <result property="openId" column="open_id" jdbcType="VARCHAR"/>
+        <result property="account" column="account" jdbcType="VARCHAR"/>
+        <result property="password" column="password" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="profile" column="profile" jdbcType="VARCHAR"/>
+        <result property="school" column="school" jdbcType="VARCHAR"/>
+        <result property="course" column="course" jdbcType="VARCHAR"/>
+        <result property="number" column="number" jdbcType="VARCHAR"/>
+        <result property="gender" column="gender" jdbcType="TINYINT"/>
+        <result property="github" column="github" jdbcType="VARCHAR"/>
+        <result property="blog" column="blog" jdbcType="VARCHAR"/>
+        <result property="avatar" column="avatar" jdbcType="VARCHAR"/>
+        <result property="signature" column="signature" jdbcType="VARCHAR"/>
+        <result property="titleName" column="title_name" jdbcType="VARCHAR"/>
+        <result property="titleColor" column="title_color" jdbcType="VARCHAR"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+        <result property="isDelete" column="is_delete" jdbcType="TINYINT"/>
     </resultMap>
 
     <sql id="Base_Column_List">
-        id,unionId,mpOpenId,
-        userAccount,password,userName,
-        profile,school,course,
-        number,gender,github,
-        blog,avatar,signature,
-        title_name,title_color,
-        createTime,updateTime,isDelete
+        id,union_id,open_id,account,password,name,
+        profile,school,course,number,gender,
+        github,blog,avatar,signature,title_name,
+        title_color,create_time,update_time,is_delete
     </sql>
+
+    <select id="selectUserListWithDeleted" resultType="com.chuan.wojmodel.pojo.entity.User">
+        SELECT * FROM user
+        <where>
+            <if test="query.id != null and query.id != ''">
+                AND id = #{query.id}
+            </if>
+
+            <if test="query.userAccount != null and query.userAccount != ''">
+                AND account = #{query.userAccount}
+            </if>
+            <if test="query.userName != null and query.userName != ''">
+                AND name LIKE CONCAT('%', #{query.userName}, '%')
+            </if>
+            <if test="query.school != null and query.school != ''">
+                AND school LIKE CONCAT('%', #{query.school}, '%')
+            </if>
+            <if test="query.number != null and query.number != ''">
+                AND number = #{query.number}
+            </if>
+            <if test="query.gender != null">
+                AND gender = #{query.gender}
+            </if>
+            <if test="query.isDelete != null">
+                AND is_delete = #{query.isDelete}
+            </if>
+        </where>
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="selectRoleNamesByUids" resultType="com.chuan.wojmodel.pojo.dto.role.UserRoleDTO">
+        SELECT ur.uid, r.role as roleName
+        FROM user_role ur
+        JOIN role r ON ur.role_id = r.id
+        WHERE ur.uid IN
+        <foreach item="id" collection="uids" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
+
 </mapper>

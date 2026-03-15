@@ -17,30 +17,30 @@ import java.util.Date;
 @TableName(value ="user_role")
 public class UserRole implements Serializable {
     /**
-     * 
+     *
      */
-    @TableId(type = IdType.AUTO)
-    private Integer id;
+    @TableId(type = IdType.ASSIGN_ID)
+    private Long id;
 
     /**
-     * 
+     *
      */
-    private String uid;
+    private Long uid;
 
     /**
-     * 
+     *
      */
-    private Integer roleid;
+    private Integer roleId;
 
     /**
-     * 
+     *
      */
-    private Date createtime;
+    private Date createTime;
 
     /**
-     * 
+     *
      */
-    private Date updatetime;
+    private Date updateTime;
 
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;

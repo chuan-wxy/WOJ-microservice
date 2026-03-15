@@ -5,12 +5,12 @@
 <mapper namespace="com.chuan.wojuserservice.mapper.RoleMapper">
 
     <resultMap id="BaseResultMap" type="com.chuan.wojmodel.pojo.entity.Role">
-            <id property="id" column="id" jdbcType="BIGINT"/>
-            <result property="role" column="role" jdbcType="VARCHAR"/>
-            <result property="description" column="description" jdbcType="VARCHAR"/>
-            <result property="status" column="status" jdbcType="TINYINT"/>
-            <result property="createtime" column="createTime" jdbcType="TIMESTAMP"/>
-            <result property="updatetime" column="updateTime" jdbcType="TIMESTAMP"/>
+        <id property="id" column="id" jdbcType="TINYINT"/>
+        <result property="role" column="role" jdbcType="VARCHAR"/>
+        <result property="description" column="description" jdbcType="VARCHAR"/>
+        <result property="status" column="status" jdbcType="TINYINT"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
     </resultMap>
 
     <sql id="Base_Column_List">
@@ -19,6 +19,6 @@
     </sql>
 
     <select id="SelectRoleByUserAccount" resultType="java.lang.String">
-        select role from `role` where id in (select roleId from `user_role` where uid = (select id from `user` where userAccount = #{userAccount}))
+        select role from `role` where id in (select role_id from `user_role` where uid = (select id from `user` where account = #{account}))
     </select>
 </mapper>

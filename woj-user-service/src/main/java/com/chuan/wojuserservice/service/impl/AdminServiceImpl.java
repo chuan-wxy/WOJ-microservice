@@ -4,24 +4,21 @@ import java.util.Date;
 import cn.hutool.core.collection.CollUtil;
 import com.alibaba.cloud.commons.lang.StringUtils;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.chuan.wojcommon.common.BaseResponse;
 import com.chuan.wojcommon.exception.StatusFailException;
 import com.chuan.wojcommon.utils.ResultUtils;
+import com.chuan.wojmodel.pojo.dto.role.UserRoleDTO;
 import com.chuan.wojmodel.pojo.dto.user.UserSearchDTO;
-import com.chuan.wojmodel.pojo.entity.Problem;
 import com.chuan.wojmodel.pojo.entity.User;
-import com.chuan.wojmodel.pojo.vo.problem.ProblemTitleVO;
 import com.chuan.wojmodel.pojo.vo.user.UserAdminVO;
-import com.chuan.wojmodel.pojo.vo.user.UserVO;
 import com.chuan.wojuserservice.mapper.UserMapper;
+import com.chuan.wojuserservice.mapper.UserRoleMapper;
 import com.chuan.wojuserservice.service.AdminService;
 import com.chuan.wojuserservice.service.UserService;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -42,47 +39,31 @@ public class AdminServiceImpl extends ServiceImpl<UserMapper, User> implements A
     @Autowired
     UserService userService;
 
+    @Autowired
+    UserRoleMapper userRoleMapper;
+
     /**
      * 根据uuid删除用户
      * @param id
      * @return
      */
     @Override
-    public BaseResponse<Void> deleteUserByid(String id, HttpServletRequest request) {
+    public BaseResponse<Void> deleteUserByid(String id) throws StatusFailException {
+        if(id.isBlank()) throw new StatusFailException("id为空");
 
+        Long userId = Long.parseLong(id);
 
-        if(id == null) {
-            return ResultUtils.error("uuid 不能为空");
-        }
-
-        // todo 判断该用户是否为管理员
-
-        return null;
+        if (this.removeById(userId)) return ResultUtils.success();
+        else return ResultUtils.error("注销失败");
     }
 
     @Override
-    public BaseResponse<Page<UserAdminVO>> getUserList(UserSearchDTO userSearchDTO) throws StatusFailException {
+    public BaseResponse<Page<UserAdminVO>> getUserList(UserSearchDTO userSearchDTO, Integer current, Integer size) throws StatusFailException {
         if (userSearchDTO == null) throw new StatusFailException("参数错误");
 
-        String id = userSearchDTO.getId();
-        String userAccount = userSearchDTO.getUserAccount();
-        String userName = userSearchDTO.getUserName();
-        String school = userSearchDTO.getSchool();
-        String number = userSearchDTO.getNumber();
-        Integer gender = userSearchDTO.getGender();
-        Integer isDelete = userSearchDTO.getIsDelete();
+        System.out.println(current+size);
 
-        LambdaQueryWrapper<User> lambdaQueryWrapper = new LambdaQueryWrapper<>();
-        lambdaQueryWrapper
-                .eq(StringUtils.isNotBlank(id), User::getId, id)
-                .eq(StringUtils.isNotBlank(userAccount), User::getUserAccount, userAccount)
-                .like(StringUtils.isNotBlank(userName), User::getUserName, userName)
-                .like(StringUtils.isNotBlank(school), User::getSchool, school)
-                .eq(StringUtils.isNotBlank(number), User::getNumber, number)
-                .eq(gender != null, User::getGender, gender)
-                .eq(isDelete != null, User::getIsDelete, isDelete);
-
-        Page<User> page = this.page(new Page<>(1, 10), lambdaQueryWrapper);
+        IPage<User> page = baseMapper.selectUserListWithDeleted(new Page<>(current, size), userSearchDTO);
 
         List<User> userList = page.getRecords();
 
@@ -92,17 +73,38 @@ public class AdminServiceImpl extends ServiceImpl<UserMapper, User> implements A
             return ResultUtils.success(userAdminVOPage);
         }
 
-        // 填充信息
+        List<Long> uids = userList.stream()
+                .map(User::getId)
+                .collect(Collectors.toList());
+
+        Map<Long, List<String>> rolesMap = this.batchGetUserRoles(uids);
+
         List<UserAdminVO> userAdminVOList = userList.stream().map(user -> {
-            UserAdminVO userAdminVO = UserAdminVO.objToVo(user);
+            UserAdminVO vo = UserAdminVO.objToVo(user);
 
-            userAdminVO.setRoles(userService.getUserRole(user.getUserAccount()).getData());
+            List<String> userRoles = rolesMap.getOrDefault(user.getId(), new ArrayList<>());
+            vo.setRoles(userRoles);
 
-            return userAdminVO;
+            return vo;
         }).collect(Collectors.toList());
 
         userAdminVOPage.setRecords(userAdminVOList);
 
         return ResultUtils.success(userAdminVOPage);
+    }
+
+    @Override
+    public Map<Long, List<String>> batchGetUserRoles(List<Long> uids) {
+        if (CollUtil.isEmpty(uids)) {
+            return new HashMap<>();
+        }
+
+        List<UserRoleDTO> userRoleDTOs = userRoleMapper.selectRoleNamesByUids(uids);
+
+        return userRoleDTOs.stream()
+                .collect(Collectors.groupingBy(
+                        UserRoleDTO::getUid,
+                        Collectors.mapping(UserRoleDTO::getRoleName, Collectors.toList())
+                ));
     }
 }

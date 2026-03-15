@@ -1,1 +1,2 @@
 com.chuan.wojcommon.config.MybatisPlusConfig
+com.chuan.wojcommon.config.JacksonConfig

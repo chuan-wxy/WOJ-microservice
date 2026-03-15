@@ -5,15 +5,24 @@
 <mapper namespace="com.chuan.wojuserservice.mapper.UserRoleMapper">
 
     <resultMap id="BaseResultMap" type="com.chuan.wojmodel.pojo.entity.UserRole">
-            <id property="id" column="id" jdbcType="TINYINT"/>
-            <result property="uid" column="uid" jdbcType="VARCHAR"/>
-            <result property="roleid" column="roleId" jdbcType="INTEGER"/>
-            <result property="createtime" column="createTime" jdbcType="TIMESTAMP"/>
-            <result property="updatetime" column="updateTime" jdbcType="TIMESTAMP"/>
+        <id property="id" column="id" jdbcType="BIGINT"/>
+        <result property="uid" column="uid" jdbcType="BIGINT"/>
+        <result property="roleId" column="role_id" jdbcType="TINYINT"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
     </resultMap>
 
     <sql id="Base_Column_List">
-        id,uid,roleId,
-        createTime,updateTime
+        id,uid,role_id,create_time,update_time
     </sql>
+
+    <select id="selectRoleNamesByUids" resultType="com.chuan.wojmodel.pojo.dto.role.UserRoleDTO">
+        SELECT ur.uid, r.role as roleName
+        FROM user_role ur
+        JOIN role r ON ur.role_id = r.id
+        WHERE ur.uid IN
+        <foreach item="id" collection="uids" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
 </mapper>

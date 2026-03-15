@@ -10,6 +10,8 @@ import com.chuan.wojmodel.pojo.vo.user.UserVO;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -21,7 +23,9 @@ import jakarta.servlet.http.HttpServletRequest;
  */
 public interface AdminService extends IService<User> {
 
-    BaseResponse<Void> deleteUserByid(String uuid, HttpServletRequest request);
+    BaseResponse<Void> deleteUserByid(String uuid) throws StatusFailException;
 
-    BaseResponse<Page<UserAdminVO>> getUserList(UserSearchDTO userSearchDTO) throws StatusFailException;
+    BaseResponse<Page<UserAdminVO>> getUserList(UserSearchDTO userSearchDTO, Integer current, Integer size) throws StatusFailException;
+
+    Map<Long, List<String>> batchGetUserRoles(List<Long> id);
 }

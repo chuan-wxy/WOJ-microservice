@@ -34,14 +34,16 @@ public class AdminController {
      * @return
      */
     @GetMapping("/delete-by-uuid")
-    public BaseResponse<Void> deleteUserByid(@RequestParam(value = "id")String id, HttpServletRequest request) {
-        return adminService.deleteUserByid(id, request);
+    public BaseResponse<Void> deleteUserByid(@RequestParam(value = "id")String id) throws StatusFailException {
+        return adminService.deleteUserByid(id);
     }
 
     // 查找用户
     @PostMapping("/user-list")
-    public BaseResponse<Page<UserAdminVO>> getUserList(@RequestBody UserSearchDTO userSearchDTO) throws StatusFailException {
-        return adminService.getUserList(userSearchDTO);
+    public BaseResponse<Page<UserAdminVO>> getUserList(@RequestBody UserSearchDTO userSearchDTO,
+                                                       @RequestParam("current") Integer current,
+                                                       @RequestParam("size") Integer size) throws StatusFailException {
+        return adminService.getUserList(userSearchDTO, current, size);
     }
 
 }

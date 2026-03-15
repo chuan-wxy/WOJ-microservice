@@ -75,7 +75,8 @@ public class ProblemSubmitServiceImpl extends ServiceImpl<ProblemSubmitMapper, P
         ProblemSubmit problemSubmit = new ProblemSubmit();
         BeanUtils.copyProperties(problemSubmitAddDTO, problemSubmit);
 
-        problemSubmit.setUid(user.getId().trim());
+        // todo
+        // problemSubmit.setUid(user.getId());
 
         boolean save = this.save(problemSubmit);
 

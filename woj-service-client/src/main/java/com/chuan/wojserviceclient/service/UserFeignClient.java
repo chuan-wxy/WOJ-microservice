@@ -49,7 +49,7 @@ public interface UserFeignClient {
 
         User user = this.getByAccount(userAccount);
 
-        if(user==null || user.getUserAccount().isBlank()){
+        if(user==null || user.getAccount().isBlank()){
             throw new StatusFailException("未登录");
         }
 
