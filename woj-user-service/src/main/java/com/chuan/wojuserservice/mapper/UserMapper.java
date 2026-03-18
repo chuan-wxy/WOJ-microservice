@@ -23,7 +23,7 @@ import org.apache.ibatis.annotations.Param;
 @Mapper
 public interface UserMapper extends BaseMapper<User> {
 
-    IPage<User> selectUserListWithDeleted(Page<User> page, @Param("query") UserSearchDTO query);
+    IPage<User> selectUserListWithDeleted(Page<User> page, @Param("searchDTO") UserSearchDTO searchDTO);
 
     List<UserRoleDTO> selectRoleNamesByUids(@Param("uids") List<Long> uids);
 }

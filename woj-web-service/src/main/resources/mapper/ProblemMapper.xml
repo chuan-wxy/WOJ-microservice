@@ -30,10 +30,6 @@
     </resultMap>
 
     <sql id="Base_Column_List">
-        id,problem_id,title,author,time_limit,memory_limit,
-        stack_limit,description,input,output,source,
-        difficulty,auth,judge_mode,spj_code,spj_language,
-        modified_user,is_file_io,io_read_file_name,io_write_file_name,create_time,
-        update_time
+        id,problem_id,title,author,time_limit,memory_limit,stack_limit,description,input,output,source,difficulty,auth,judge_mode,spj_code,spj_language,modified_user,is_file_io,io_read_file_name,io_write_file_name,create_time,update_time
     </sql>
 </mapper>

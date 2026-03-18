@@ -35,7 +35,7 @@ mybatis-plus:
       # 逻辑未删除值
       logic-not-delete-value: 0
   configuration:
-    map-underscore-to-camel-case: false
+    map-underscore-to-camel-case: true
 
 # springdoc-openapi项目配置
 springdoc:

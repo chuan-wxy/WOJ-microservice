@@ -2,6 +2,7 @@ package com.chuan.wojmodel.pojo.dto.announcement;
 
 import lombok.Data;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -22,6 +23,7 @@ public class AnnouncementAddDTO implements Serializable {
      */
     private String content;
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
 }

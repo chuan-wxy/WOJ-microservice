@@ -1,10 +1,13 @@
 package com.chuan.wojwebservice.service.announcement.Impl;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.chuan.wojcommon.common.BaseResponse;
 import com.chuan.wojcommon.exception.StatusFailException;
 import com.chuan.wojcommon.utils.ResultUtils;
 import com.chuan.wojmodel.pojo.dto.announcement.AnnouncementAddDTO;
+import com.chuan.wojmodel.pojo.dto.announcement.AnnouncementSearchDTO;
 import com.chuan.wojmodel.pojo.entity.Announcement;
 import com.chuan.wojmodel.pojo.vo.announcement.AnnouncementContentVO;
 import com.chuan.wojmodel.pojo.vo.announcement.AnnouncementTitleVO;
@@ -14,8 +17,8 @@ import com.chuan.wojwebservice.service.announcement.AnnouncementService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
+
 
 /**
 * @author chuan-wxy
@@ -52,10 +55,10 @@ public class AnnouncementServiceImpl extends ServiceImpl<AnnouncementMapper, Ann
 
 
     @Override
-    public BaseResponse<List<AnnouncementTitleVO>> getAnnouncementList() {
+    public BaseResponse<List<AnnouncementTitleVO>> getAnnouncementTitleList() {
         List<AnnouncementTitleVO> announcementTitleVOS = announcementMapper.selectAnnouncementTitleList();
         for (int i = 0; i < announcementTitleVOS.size(); i++) {
-            announcementTitleVOS.get(i).setCreateTime(announcementTitleVOS.get(i).getCreateTime().substring(0, 10));
+            announcementTitleVOS.get(i).setCreateTime(announcementTitleVOS.get(i).getCreateTime());
         }
         return ResultUtils.success(announcementTitleVOS);
     }
@@ -71,6 +74,26 @@ public class AnnouncementServiceImpl extends ServiceImpl<AnnouncementMapper, Ann
     @Override
     public BaseResponse<AnnouncementContentVO> getLastAnnouncement() {
         return ResultUtils.success(announcementMapper.selectLatestAnnouncementContentVO());
+    }
+
+    @Override
+    public BaseResponse<Page<AnnouncementContentVO>> getAnnouncementList(AnnouncementSearchDTO announcementSearchDTO, Integer current, Integer size) {
+        int pageNum = (current == null || current <= 0) ? 1 : current;
+        int pageSize = (size == null || size <= 0) ? 10 : size;
+
+        if (announcementSearchDTO == null) {
+            announcementSearchDTO = new AnnouncementSearchDTO();
+        }
+
+
+        IPage<Announcement> page = announcementMapper.selectAnnouncementList(
+                new Page<>(pageNum, pageSize),
+                announcementSearchDTO
+        );
+
+        IPage<AnnouncementContentVO> resultPage = page.convert(AnnouncementContentVO::objToVo);
+
+        return ResultUtils.success((Page<AnnouncementContentVO>) resultPage);
     }
 }
 

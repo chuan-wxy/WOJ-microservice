@@ -1,9 +1,13 @@
 package com.chuan.wojwebservice.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.chuan.wojmodel.pojo.dto.announcement.AnnouncementSearchDTO;
 import com.chuan.wojmodel.pojo.entity.Announcement;
 import com.chuan.wojmodel.pojo.vo.announcement.AnnouncementContentVO;
 import com.chuan.wojmodel.pojo.vo.announcement.AnnouncementTitleVO;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -20,6 +24,8 @@ public interface AnnouncementMapper extends BaseMapper<Announcement> {
     AnnouncementContentVO selectAnnouncementContentVO(Integer id);
 
     AnnouncementContentVO selectLatestAnnouncementContentVO();
+
+    IPage<Announcement> selectAnnouncementList(Page<Object> objectPage, @Param("searchDTO") AnnouncementSearchDTO searchDTO);
 }
 
 

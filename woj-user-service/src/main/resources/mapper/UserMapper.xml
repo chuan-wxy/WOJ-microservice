@@ -37,27 +37,27 @@
     <select id="selectUserListWithDeleted" resultType="com.chuan.wojmodel.pojo.entity.User">
         SELECT * FROM user
         <where>
-            <if test="query.id != null and query.id != ''">
-                AND id = #{query.id}
+            <if test="searchDTO.id != null and searchDTO.id != ''">
+                AND id = #{searchDTO.id}
             </if>
 
-            <if test="query.userAccount != null and query.userAccount != ''">
-                AND account = #{query.userAccount}
+            <if test="searchDTO.userAccount != null and searchDTO.userAccount != ''">
+                AND account = #{searchDTO.userAccount}
             </if>
-            <if test="query.userName != null and query.userName != ''">
-                AND name LIKE CONCAT('%', #{query.userName}, '%')
+            <if test="searchDTO.userName != null and searchDTO.userName != ''">
+                AND name LIKE CONCAT('%', #{searchDTO.userName}, '%')
             </if>
-            <if test="query.school != null and query.school != ''">
-                AND school LIKE CONCAT('%', #{query.school}, '%')
+            <if test="searchDTO.school != null and searchDTO.school != ''">
+                AND school LIKE CONCAT('%', #{searchDTO.school}, '%')
             </if>
-            <if test="query.number != null and query.number != ''">
-                AND number = #{query.number}
+            <if test="searchDTO.number != null and searchDTO.number != ''">
+                AND number = #{searchDTO.number}
             </if>
-            <if test="query.gender != null">
-                AND gender = #{query.gender}
+            <if test="searchDTO.gender != null">
+                AND gender = #{searchDTO.gender}
             </if>
-            <if test="query.isDelete != null">
-                AND is_delete = #{query.isDelete}
+            <if test="searchDTO.isDelete != null">
+                AND is_delete = #{searchDTO.isDelete}
             </if>
         </where>
         ORDER BY create_time DESC

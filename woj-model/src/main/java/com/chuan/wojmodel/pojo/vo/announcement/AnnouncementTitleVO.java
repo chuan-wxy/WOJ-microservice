@@ -2,7 +2,9 @@ package com.chuan.wojmodel.pojo.vo.announcement;
 
 import lombok.Data;
 
+import java.io.Serial;
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * @Author: chuan-wxy
@@ -14,7 +16,7 @@ public class AnnouncementTitleVO implements Serializable {
     /**
      *
      */
-    private Long id;
+    private Integer id;
 
     /**
      * 名称
@@ -24,7 +26,8 @@ public class AnnouncementTitleVO implements Serializable {
     /**
      * 名称
      */
-    private String createTime;
+    private Date createTime;
 
+    @Serial
     private static final long serialVersionUID = 1L;
 }

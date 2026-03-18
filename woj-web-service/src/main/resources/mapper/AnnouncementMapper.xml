@@ -5,29 +5,43 @@
 <mapper namespace="com.chuan.wojwebservice.mapper.AnnouncementMapper">
 
     <resultMap id="BaseResultMap" type="com.chuan.wojmodel.pojo.entity.Announcement">
-            <id property="id" column="id" jdbcType="BIGINT"/>
+            <id property="id" column="id" jdbcType="INTEGER"/>
             <result property="title" column="title" jdbcType="VARCHAR"/>
             <result property="content" column="content" jdbcType="VARCHAR"/>
-            <result property="createtime" column="createTime" jdbcType="TIMESTAMP"/>
-            <result property="updatetime" column="updateTime" jdbcType="TIMESTAMP"/>
+            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+            <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
     </resultMap>
 
     <sql id="Base_Column_List">
         id,title,content,
-        createTime,updateTime
+        create_time,update_time
     </sql>
     <select id="selectAnnouncementTitleList" resultType="com.chuan.wojmodel.pojo.vo.announcement.AnnouncementTitleVO">
-        SELECT id,title,createTime FROM `announcement` ORDER BY id DESC limit 4;
+        SELECT id,title,create_time FROM `announcement` ORDER BY id DESC limit 4;
     </select>
     <select id="selectAnnouncementContentVO"
             resultType="com.chuan.wojmodel.pojo.vo.announcement.AnnouncementContentVO">
-        SELECT id,title,content,createTime FROM `announcement` where id =#{id};
+        SELECT id,title,content,create_time FROM `announcement` where id =#{id};
     </select>
 
     <select id="selectLatestAnnouncementContentVO" resultType="com.chuan.wojmodel.pojo.vo.announcement.AnnouncementContentVO">
-        SELECT id,title,content,createTime
+        SELECT id,title,content,create_time
         FROM announcement
-        ORDER BY createTime DESC
+        ORDER BY create_time DESC
         LIMIT 1
+    </select>
+
+    <select id="selectAnnouncementList" resultType="com.chuan.wojmodel.pojo.entity.Announcement">
+        SELECT * FROM announcement
+        <where>
+            <if test="searchDTO.id != null">
+                AND id = #{searchDTO.id}
+            </if>
+
+            <if test="searchDTO.title != null and searchDTO.userAccount != ''">
+                AND account = #{searchDTO.userAccount}
+            </if>
+        </where>
+        ORDER BY create_time DESC
     </select>
 </mapper>

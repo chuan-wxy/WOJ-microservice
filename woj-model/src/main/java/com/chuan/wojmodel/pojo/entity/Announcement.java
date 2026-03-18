@@ -1,11 +1,11 @@
 package com.chuan.wojmodel.pojo.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -13,14 +13,14 @@ import java.util.Date;
  * 
  * @TableName announcement
  */
-@TableName(value ="announcement")
 @Data
+@TableName(value ="announcement")
 public class Announcement implements Serializable {
     /**
      * 
      */
     @TableId(type = IdType.AUTO)
-    private Long id;
+    private Integer id;
 
     /**
      * 标题
@@ -35,13 +35,13 @@ public class Announcement implements Serializable {
     /**
      * 
      */
-    private Date createtime;
+    private Date createTime;
 
     /**
      * 
      */
-    private Date updatetime;
+    private Date updateTime;
 
-    @TableField(exist = false)
+    @Serial
     private static final long serialVersionUID = 1L;
 }
