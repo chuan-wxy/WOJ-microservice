@@ -1,4 +1,4 @@
-package com.chuan.wojwebservice.service.problem.impl;
+package com.chuan.wojwebservice.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.chuan.wojcommon.common.BaseResponse;
@@ -6,7 +6,7 @@ import com.chuan.wojcommon.utils.ResultUtils;
 import com.chuan.wojmodel.pojo.entity.Tag;
 import com.chuan.wojmodel.pojo.vo.problem.TagVO;
 import com.chuan.wojwebservice.mapper.TagMapper;
-import com.chuan.wojwebservice.service.problem.TagService;
+import com.chuan.wojwebservice.service.TagService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 

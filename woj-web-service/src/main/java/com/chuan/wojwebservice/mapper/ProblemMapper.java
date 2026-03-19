@@ -16,7 +16,3 @@ public interface ProblemMapper extends BaseMapper<Problem> {
 
     List<ProblemTagDTO> selectProblemTagsByPids(@Param("pids")List<Long> pids);
 }
-
-
-
-

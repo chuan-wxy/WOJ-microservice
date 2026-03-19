@@ -57,8 +57,8 @@ logging:
 #自定义代码代码沙箱的输出地址，默认为false，使用项目目录下的questionCode作为文件的输出地址，开启后将使用指定的地址
 path:
   code:
-    submit-code-path: "D:\\Desktop\\WOJ\\NEW\\WOJ\\WOJ\\submitcode"
-    judgecase-path: "D:\\Desktop\\WOJ\\NEW\\WOJ\\WOJ\\judgecase"
+    submit-code-path: "D:\\Desktop\\WOJ\\submitcode"
+    judgecase-path: "I:\\Desktop\\WOJ\\judgecase"
   avatar:
     user-avatar-path: "D:\\Desktop\\WOJ\\NEW\\WOJ\\WOJ\\avatar\\user"
     course-avatar-path: "D:\\Desktop\\WOJ\\NEW\\WOJ\\WOJ\\avatar\\course"

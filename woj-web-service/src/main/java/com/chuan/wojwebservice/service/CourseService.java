@@ -1,4 +1,4 @@
-package com.chuan.wojwebservice.service.course;
+package com.chuan.wojwebservice.service;
 
 
 import com.baomidou.mybatisplus.extension.service.IService;

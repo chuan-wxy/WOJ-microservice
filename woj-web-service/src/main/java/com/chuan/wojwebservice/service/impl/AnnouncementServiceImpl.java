@@ -1,4 +1,4 @@
-package com.chuan.wojwebservice.service.announcement.Impl;
+package com.chuan.wojwebservice.service.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -13,7 +13,7 @@ import com.chuan.wojmodel.pojo.vo.announcement.AnnouncementContentVO;
 import com.chuan.wojmodel.pojo.vo.announcement.AnnouncementTitleVO;
 import com.chuan.wojwebservice.manager.ActivityManager;
 import com.chuan.wojwebservice.mapper.AnnouncementMapper;
-import com.chuan.wojwebservice.service.announcement.AnnouncementService;
+import com.chuan.wojwebservice.service.AnnouncementService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

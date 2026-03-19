@@ -3,8 +3,8 @@ package com.chuan.wojwebservice.controller.inner;
 import com.chuan.wojmodel.pojo.entity.Problem;
 import com.chuan.wojmodel.pojo.entity.ProblemSubmit;
 import com.chuan.wojserviceclient.service.WebFeignClient;
-import com.chuan.wojwebservice.service.problem.ProblemService;
-import com.chuan.wojwebservice.service.problemSubmit.ProblemSubmitService;
+import com.chuan.wojwebservice.service.ProblemService;
+import com.chuan.wojwebservice.service.ProblemSubmitService;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.*;
 

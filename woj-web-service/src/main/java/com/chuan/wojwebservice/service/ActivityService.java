@@ -1,4 +1,4 @@
-package com.chuan.wojwebservice.service.activity;
+package com.chuan.wojwebservice.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.chuan.wojcommon.common.BaseResponse;

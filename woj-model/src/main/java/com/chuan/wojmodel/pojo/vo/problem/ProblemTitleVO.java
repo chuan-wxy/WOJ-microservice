@@ -34,6 +34,11 @@ public class ProblemTitleVO implements Serializable {
     private String title;
 
     /**
+     * 作者
+     */
+    private String author;
+
+    /**
      * 标签
      */
     private List<String> tagList;
@@ -64,6 +69,7 @@ public class ProblemTitleVO implements Serializable {
         ProblemTitleVO problemTitleVO = new ProblemTitleVO();
         problemTitleVO.setProblemId(problem.getProblemId());
         problemTitleVO.setTitle(problem.getTitle());
+        problemTitleVO.setAuthor(problem.getAuthor());
         problemTitleVO.setId(problem.getId());
         problemTitleVO.setSource(problem.getSource());
         problemTitleVO.setDifficulty(problem.getDifficulty());

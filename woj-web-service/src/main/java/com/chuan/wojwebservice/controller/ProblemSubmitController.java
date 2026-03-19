@@ -9,7 +9,7 @@ import com.chuan.wojmodel.pojo.entity.User;
 import com.chuan.wojmodel.pojo.vo.problemSubmit.ProblemSubmitVO;
 import com.chuan.wojmodel.pojo.vo.user.UserLoginVO;
 import com.chuan.wojserviceclient.service.UserFeignClient;
-import com.chuan.wojwebservice.service.problemSubmit.ProblemSubmitService;
+import com.chuan.wojwebservice.service.ProblemSubmitService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;

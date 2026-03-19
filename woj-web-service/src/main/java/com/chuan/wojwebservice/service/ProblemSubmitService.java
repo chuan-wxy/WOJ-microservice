@@ -1,4 +1,4 @@
-package com.chuan.wojwebservice.service.problemSubmit;
+package com.chuan.wojwebservice.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.chuan.wojcommon.exception.StatusFailException;

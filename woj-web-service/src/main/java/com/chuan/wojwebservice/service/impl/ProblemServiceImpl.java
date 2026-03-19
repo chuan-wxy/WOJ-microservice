@@ -1,4 +1,4 @@
-package com.chuan.wojwebservice.service.problem.impl;
+package com.chuan.wojwebservice.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateTime;
@@ -26,7 +26,7 @@ import com.chuan.wojwebservice.mapper.ProblemMapper;
 import com.chuan.wojwebservice.mapper.ProblemStatsMapper;
 import com.chuan.wojwebservice.mapper.ProblemTagMapper;
 import com.chuan.wojwebservice.mapper.TagMapper;
-import com.chuan.wojwebservice.service.problem.ProblemService;
+import com.chuan.wojwebservice.service.ProblemService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -227,7 +227,7 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem>
 
         LambdaQueryWrapper<Problem> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper
-                .select(Problem::getId, Problem::getProblemId, Problem::getTitle, Problem::getSource, Problem::getDifficulty)
+                .select(Problem::getId, Problem::getProblemId, Problem::getTitle, Problem::getAuthor, Problem::getSource, Problem::getDifficulty)
                 .eq(id != null, Problem::getId, id)
                 .like(StringUtils.isNotBlank(problemId), Problem::getProblemId, problemId)
                 .like(StringUtils.isNotBlank(title), Problem::getTitle, title)

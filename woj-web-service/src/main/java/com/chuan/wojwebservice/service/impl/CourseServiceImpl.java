@@ -1,4 +1,4 @@
-package com.chuan.wojwebservice.service.course.impl;
+package com.chuan.wojwebservice.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -10,7 +10,7 @@ import com.chuan.wojmodel.pojo.dto.course.CourseAddDTO;
 import com.chuan.wojmodel.pojo.entity.Course;
 import com.chuan.wojwebservice.manager.CourseManager;
 import com.chuan.wojwebservice.mapper.CourseMapper;
-import com.chuan.wojwebservice.service.course.CourseService;
+import com.chuan.wojwebservice.service.CourseService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

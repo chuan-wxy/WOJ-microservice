@@ -5,7 +5,7 @@ import com.chuan.wojcommon.exception.StatusFailException;
 import com.chuan.wojmodel.pojo.dto.activity.ActivityAddDTO;
 import com.chuan.wojmodel.pojo.vo.activity.ActivityContentVO;
 import com.chuan.wojmodel.pojo.vo.activity.ActivityTitleVO;
-import com.chuan.wojwebservice.service.activity.ActivityService;
+import com.chuan.wojwebservice.service.ActivityService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

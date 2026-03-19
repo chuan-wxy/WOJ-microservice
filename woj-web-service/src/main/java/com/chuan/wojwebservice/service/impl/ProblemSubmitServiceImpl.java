@@ -1,4 +1,4 @@
-package com.chuan.wojwebservice.service.problemSubmit.impl;
+package com.chuan.wojwebservice.service.impl;
 
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -14,8 +14,8 @@ import com.chuan.wojmodel.pojo.entity.User;
 import com.chuan.wojmodel.pojo.vo.problemSubmit.ProblemSubmitVO;
 import com.chuan.wojserviceclient.service.JudgeFeignClient;
 import com.chuan.wojwebservice.mapper.ProblemSubmitMapper;
-import com.chuan.wojwebservice.service.problem.ProblemService;
-import com.chuan.wojwebservice.service.problemSubmit.ProblemSubmitService;
+import com.chuan.wojwebservice.service.ProblemService;
+import com.chuan.wojwebservice.service.ProblemSubmitService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;

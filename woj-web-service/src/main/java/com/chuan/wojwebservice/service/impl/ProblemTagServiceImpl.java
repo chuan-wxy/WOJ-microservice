@@ -1,9 +1,9 @@
-package com.chuan.wojwebservice.service.problem.impl;
+package com.chuan.wojwebservice.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.chuan.wojmodel.pojo.entity.ProblemTag;
 import com.chuan.wojwebservice.mapper.ProblemTagMapper;
-import com.chuan.wojwebservice.service.problem.ProblemTagService;
+import com.chuan.wojwebservice.service.ProblemTagService;
 import org.springframework.stereotype.Service;
 
 /**

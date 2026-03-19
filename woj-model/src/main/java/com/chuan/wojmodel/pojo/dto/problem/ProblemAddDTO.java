@@ -17,6 +17,7 @@ import java.util.List;
 @Data
 public class ProblemAddDTO implements Serializable {
 
+    @NotBlank(message = "自定义Id不能为空")
     private String problemId;
 
     @NotBlank(message = "标题不能为空")

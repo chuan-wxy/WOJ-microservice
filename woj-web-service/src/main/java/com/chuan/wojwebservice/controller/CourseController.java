@@ -6,7 +6,7 @@ import com.chuan.wojcommon.exception.StatusFailException;
 import com.chuan.wojcommon.utils.CourseTreeBuilder;
 import com.chuan.wojmodel.pojo.dto.course.CourseAddDTO;
 import com.chuan.wojmodel.pojo.entity.Course;
-import com.chuan.wojwebservice.service.course.CourseService;
+import com.chuan.wojwebservice.service.CourseService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

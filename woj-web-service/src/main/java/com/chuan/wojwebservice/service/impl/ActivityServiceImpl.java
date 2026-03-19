@@ -1,4 +1,4 @@
-package com.chuan.wojwebservice.service.activity.Impl;
+package com.chuan.wojwebservice.service.impl;
 
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -11,7 +11,7 @@ import com.chuan.wojmodel.pojo.vo.activity.ActivityContentVO;
 import com.chuan.wojmodel.pojo.vo.activity.ActivityTitleVO;
 import com.chuan.wojwebservice.manager.ActivityManager;
 import com.chuan.wojwebservice.mapper.ActivityMapper;
-import com.chuan.wojwebservice.service.activity.ActivityService;
+import com.chuan.wojwebservice.service.ActivityService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
