@@ -27,5 +27,4 @@ public interface AdminService extends IService<User> {
 
     BaseResponse<Page<UserAdminVO>> getUserList(UserSearchDTO userSearchDTO, Integer current, Integer size) throws StatusFailException;
 
-    Map<Long, List<String>> batchGetUserRoles(List<Long> id);
 }

@@ -9,5 +9,6 @@ import lombok.Data;
 @Data
 public class UserRoleDTO {
     private Long uid;
+
     private String roleName;
 }

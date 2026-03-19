@@ -1,7 +1,11 @@
 package com.chuan.wojmodel.pojo.dto.problem;
 
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 
@@ -13,85 +17,37 @@ import java.util.List;
 @Data
 public class ProblemAddDTO implements Serializable {
 
-    /**
-     * 问题的自定义ID
-     */
     private String problemId;
 
-    /**
-     * 题目
-     */
+    @NotBlank(message = "标题不能为空")
     private String title;
 
-    /**
-     * 作者
-     */
     private String author;
 
-    /**
-     * 标签
-     */
     private List<String> tagList;
 
-    /**
-     * 单位ms
-     */
     private Integer timeLimit;
 
-    /**
-     * 单位kb
-     */
     private Integer memoryLimit;
 
-    /**
-     * 单位mb
-     */
     private Integer stackLimit;
 
-    /**
-     * 描述
-     */
+    @NotBlank(message="题目描述不能为空")
     private String description;
 
-    /**
-     * 输入描述
-     */
-    private String input;
-
-    /**
-     * 输出描述
-     */
-    private String output;
-
-    /**
-     * 题目来源
-     */
     private String source;
 
-    /**
-     * 题目难度,0简单，1中等，2困难
-     */
+    @NotNull
     private Integer difficulty;
 
-    /**
-     * 默认为1公开，2为私有，3为比赛题目
-     */
     private Integer auth;
 
-    /**
-     * 题目评测模式,default、spj、interactive
-     */
     private String judgeMode;
 
-    /**
-     * 特判程序或交互程序代码
-     */
     private String spjCode;
 
-    /**
-     * 特判程序或交互程序代码的语言
-     */
     private String spjLanguage;
 
+    @Serial
     private static final long serialVersionUID = 1L;
 }

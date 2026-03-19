@@ -19,7 +19,6 @@ public interface UserRoleMapper extends BaseMapper<UserRole> {
 
     List<UserRoleDTO> selectRoleNamesByUids(@Param("uids") List<Long> uids);
 
-
 }
 
 

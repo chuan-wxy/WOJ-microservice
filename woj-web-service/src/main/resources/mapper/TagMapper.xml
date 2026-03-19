@@ -15,7 +15,10 @@
         id,name,create_time,
         update_time
     </sql>
-    <select id="seleceIdByName" resultType="java.lang.Long">
-        select id from `tag` where name = #{name}
+    <select id="selectIdByName" resultType="java.lang.Long">
+        SELECT id FROM tag WHERE name = #{name}
+    </select>
+    <select id="selectByName" resultType="com.chuan.wojmodel.pojo.entity.Tag">
+        SELECT * FROM tag WHERE name = #{name}
     </select>
 </mapper>

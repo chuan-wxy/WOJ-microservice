@@ -1,9 +1,12 @@
 package com.chuan.wojwebservice.service.problem.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateTime;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.chuan.wojcommon.common.BaseResponse;
@@ -12,16 +15,15 @@ import com.chuan.wojcommon.exception.StatusSystemErrorException;
 import com.chuan.wojcommon.utils.DataExtractorUtil;
 import com.chuan.wojcommon.utils.ResultUtils;
 import com.chuan.wojmodel.pojo.dto.problem.ProblemAddDTO;
+import com.chuan.wojmodel.pojo.dto.problem.ProblemSearchDTO;
+import com.chuan.wojmodel.pojo.dto.problem.ProblemTagDTO;
 import com.chuan.wojmodel.pojo.dto.problem.ProblemUpdateDTO;
-import com.chuan.wojmodel.pojo.entity.Problem;
-import com.chuan.wojmodel.pojo.entity.ProblemInformation;
-import com.chuan.wojmodel.pojo.entity.ProblemTag;
-import com.chuan.wojmodel.pojo.entity.Tag;
+import com.chuan.wojmodel.pojo.entity.*;
 import com.chuan.wojmodel.pojo.vo.problem.ProblemTitleVO;
 import com.chuan.wojmodel.pojo.vo.problem.ProblemVO;
 import com.chuan.wojwebservice.manager.ProblemManager;
-import com.chuan.wojwebservice.mapper.ProblemInformationMapper;
 import com.chuan.wojwebservice.mapper.ProblemMapper;
+import com.chuan.wojwebservice.mapper.ProblemStatsMapper;
 import com.chuan.wojwebservice.mapper.ProblemTagMapper;
 import com.chuan.wojwebservice.mapper.TagMapper;
 import com.chuan.wojwebservice.service.problem.ProblemService;
@@ -31,8 +33,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -51,8 +53,7 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem>
     private ProblemManager problemManager;
 
     @Autowired
-    private ProblemInformationMapper problemInformationMapper;
-
+    private ProblemStatsMapper problemStatsMapper;
 
     @Autowired
     DataExtractorUtil dataExtractorUtil;
@@ -60,44 +61,31 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem>
     @Override
     @Transactional(rollbackFor = Exception.class)
     public BaseResponse<String> addProblem(ProblemAddDTO problemAddDTO) throws StatusFailException, StatusSystemErrorException {
-
-        problemManager.validateSubmitInfo(problemAddDTO);
-
-        String author = problemAddDTO.getAuthor();
-        String source = problemAddDTO.getSource();
-
         Problem problem = new Problem();
         BeanUtils.copyProperties(problemAddDTO, problem);
-        problem.setTagList(problemAddDTO.getTagList().toString());
 
-        int row = problemMapper.insert(problem);
-        if (row != 1) {
-            log.info("[addProblem] row非1,插入Problem失败");
-            return ResultUtils.error("插入失败");
-        }
+        if(problemMapper.insert(problem) != 1) throw new StatusFailException("插入数据库失败");
 
-        ProblemInformation problemInformation = new ProblemInformation();
-        problemInformationMapper.insert(problemInformation);
+        for(String tagStr : problemAddDTO.getTagList()) {
+            Tag tag = tagMapper.selectByName(tagStr);
+            if(tag == null) {
+                tag = new Tag();
+                tag.setName(tagStr);
+                tagMapper.insert(tag);
+            }
 
-        QueryWrapper<Problem> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("problemId", problemAddDTO.getProblemId());
-        problem = problemMapper.selectOne(queryWrapper);
-        long problemId = problem.getId();
-
-        for (String tag : problemAddDTO.getTagList()) {
             ProblemTag problemTag = new ProblemTag();
 
-            Long tid = tagMapper.seleceIdByName(tag);
+            problemTag.setPid(problem.getId());
+            problemTag.setTid(tag.getId());
 
-            problemTag.setPid(problemId);
-            problemTag.setTid(tid);
-
-            row = problemTagMapper.insert(problemTag);
-            if (row != 1) {
-                log.info("[addProblem] 插入ProblemTag失败");
-                throw new StatusSystemErrorException("插入失败");
-            }
+            problemTagMapper.insert(problemTag);
         }
+
+        ProblemStats problemStats = new ProblemStats();
+        problemStats.setPid(problem.getId());
+        problemStatsMapper.insert(problemStats);
+
         return ResultUtils.success("插入成功");
     }
 
@@ -109,9 +97,9 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem>
         tag.setName(tagName);
 
         QueryWrapper<Tag> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("name",tagName);
+        queryWrapper.eq("name", tagName);
         Tag tag1 = tagMapper.selectOne(queryWrapper);
-        if(tag1!=null) {
+        if (tag1 != null) {
             return null;
         }
 
@@ -124,84 +112,94 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem>
     }
 
     @Override
-    public BaseResponse<Page<ProblemTitleVO>> getProblemTitle(Integer current, Integer size) throws StatusFailException {
-        if(current==null || size==null) {
-            log.info("ProblemServiceImpl---->getProblemTitle---current和size为空");
-            throw new StatusFailException("current和size不能为空");
-        }
-        Page<Problem> page = this.page(new Page<>(current, size));
-        return ResultUtils.success(problemManager.getProblemTitleVOPage(page));
-    }
-
-    @Override
-    public BaseResponse<ProblemVO> getProblem(Long id) throws StatusFailException {
-        if (id == null) {
-            throw new StatusFailException("id为空");
-        }
-        QueryWrapper<Problem> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("id", id);
-
-        Problem problem = problemMapper.selectOne(queryWrapper);
-        ProblemVO problemVO = new ProblemVO();
-
-        String tagStr = problem.getTagList();
-        if (tagStr.startsWith("[") && tagStr.endsWith("]")) {
-            // 去除字符串的首尾字符
-            tagStr = tagStr.substring(1, tagStr.length() - 1);
+    public BaseResponse<ProblemVO> getProblem(String id) throws StatusFailException {
+        Long pid;
+        try {
+            pid = Long.parseLong(id);
+        } catch (NumberFormatException e) {
+            throw new StatusFailException("ID格式错误，必须为数字");
         }
 
-        List<String> tagList = Arrays.asList(tagStr.split(", "));
-        BeanUtils.copyProperties(problem, problemVO);
-        problemVO.setTagList(tagList);
+        Problem problem = problemMapper.selectById(pid);
+
+        if (problem == null) {
+            throw new StatusFailException("根据ID：" + id + " 未找到对应的问题");
+        }
+
+        ProblemVO problemVO = ProblemVO.objToVo(problem);
+
+        List<Long> pids = new ArrayList<>();
+        pids.add(pid);
+
+        Map<Long, List<String>> tagsMap = this.batchGetProblemTags(pids);
+
+        List<String> problemTags = tagsMap.getOrDefault(problem.getId(), new ArrayList<>());
+        problemVO.setTagList(problemTags);
+
         return ResultUtils.success(problemVO);
     }
 
     @Override
-    public BaseResponse<Page<ProblemTitleVO>> searchProblemTitle(Integer current, Integer size, String text) throws StatusFailException {
-        if(current==null||size==null) {
-            throw new StatusFailException("current和size不能为空");
-        }
-        dataExtractorUtil.doExtraction(text);
-        List<String> difficulty = dataExtractorUtil.getDifficulties();
-        List<String> tags = dataExtractorUtil.getTags();
-        List<String> keyword = dataExtractorUtil.getKeywords();
-        // 题库页普通查询
-        Page<Problem> page = this.page(new Page<>(current, size),
-                problemManager.getQueryWrapper(keyword,tags,difficulty));
-        return ResultUtils.success(problemManager.getProblemTitleVOPage(page));
-    }
-
-    @Override
-    public BaseResponse<IPage<ProblemTitleVO>> searchProblemTitleTwo(Integer current, Integer size, Long id, String tags, String difficulty, String title) throws StatusFailException {
-        if(current==null||size==null) {
-            throw new StatusFailException("current和size不能为空");
+    public BaseResponse<ProblemStats> getProblemStatistics(String id) throws StatusFailException {
+        Long pid;
+        try {
+            pid = Long.parseLong(id);
+        } catch (NumberFormatException e) {
+            throw new StatusFailException("ID格式错误，必须为数字");
         }
 
-        Page<Problem> page = this.page(new Page<>(current, size),
-                problemManager.getQueryWrapperTwo(id,tags,difficulty,title));
-        return ResultUtils.success(problemManager.getProblemTitleVOPage(page));
+        ProblemStats problemStats = problemStatsMapper.getByPid(pid);
+
+        return ResultUtils.success(problemStats);
     }
+
+//    @Override
+//    public BaseResponse<Page<ProblemTitleVO>> searchProblemTitle(Integer current, Integer size, String text) throws StatusFailException {
+//        if (current == null || size == null) {
+//            throw new StatusFailException("current和size不能为空");
+//        }
+//        dataExtractorUtil.doExtraction(text);
+//        List<String> difficulty = dataExtractorUtil.getDifficulties();
+//        List<String> tags = dataExtractorUtil.getTags();
+//        List<String> keyword = dataExtractorUtil.getKeywords();
+//        // 题库页普通查询
+//        Page<Problem> page = this.page(new Page<>(current, size),
+//                problemManager.getQueryWrapper(keyword, tags, difficulty));
+//        return ResultUtils.success(problemManager.getProblemTitleVOPage(page));
+//    }
+
+//    @Override
+//    public BaseResponse<IPage<ProblemTitleVO>> searchProblemTitleTwo(Integer current, Integer size, Long id, String tags, String difficulty, String title) throws StatusFailException {
+//        if (current == null || size == null) {
+//            throw new StatusFailException("current和size不能为空");
+//        }
+//
+//        Page<Problem> page = this.page(new Page<>(current, size),
+//                problemManager.getQueryWrapperTwo(id, tags, difficulty, title));
+//        return ResultUtils.success(problemManager.getProblemTitleVOPage(page));
+//    }
 
     @Override
     public BaseResponse<String> updateProblem(ProblemUpdateDTO problemUpdateDTO) throws StatusFailException {
-        if(problemUpdateDTO == null || problemUpdateDTO.getId() == null) {
+        if (problemUpdateDTO == null || problemUpdateDTO.getId() == null) {
             throw new StatusFailException("id不能为空");
         }
         long pid = problemUpdateDTO.getId();
         Problem problem = problemMapper.selectById(pid);
-        if(problem == null) {
+        if (problem == null) {
             throw new StatusFailException("该id不存在");
         }
 
         UpdateWrapper<Problem> updateWrapper = new UpdateWrapper<>();
-        updateWrapper.eq("id",pid);
+        updateWrapper.eq("id", pid);
 
         Problem newProblem = new Problem();
-        BeanUtils.copyProperties(problemUpdateDTO,newProblem);
-        newProblem.setTagList(problemUpdateDTO.getTagList().toString());
+        BeanUtils.copyProperties(problemUpdateDTO, newProblem);
+        // todo
+        // newProblem.setTagList(problemUpdateDTO.getTagList().toString());
         newProblem.setUpdateTime(DateTime.now());
-        int row = problemMapper.update(newProblem,updateWrapper);
-        if(row != 1) {
+        int row = problemMapper.update(newProblem, updateWrapper);
+        if (row != 1) {
             log.info("ProblemServiceImpl--->updateProblem()---更新题目信息失败");
             return ResultUtils.error("更新失败");
         }
@@ -209,21 +207,72 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem>
         return ResultUtils.success("更新成功");
     }
 
+
+    // todo 实现题目标签查找
     @Override
-    public BaseResponse<ProblemInformation> getProblemInformation(Long id) {
-        if(id == null) {
-            return ResultUtils.error("id为空");
+    public BaseResponse<Page<ProblemTitleVO>> getProblemTitleList(ProblemSearchDTO problemSearchDTO, Integer current, Integer size) {
+        int pageNum = (current == null || current <= 0) ? 1 : current;
+        int pageSize = (size == null || size <= 0) ? 10 : size;
+
+        if (problemSearchDTO == null) {
+            problemSearchDTO = new ProblemSearchDTO();
         }
-        QueryWrapper<ProblemInformation> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("pid", id);
-        ProblemInformation problemInformation = problemInformationMapper.selectOne(queryWrapper);
-        if(problemInformation == null) {
-            return ResultUtils.error("id错误");
+
+        Long id = problemSearchDTO.getId();
+        String problemId = problemSearchDTO.getProblemId();
+        String title = problemSearchDTO.getTitle();
+        String author = problemSearchDTO.getAuthor();
+        String source = problemSearchDTO.getSource();
+        Integer difficulty = problemSearchDTO.getDifficulty();
+
+        LambdaQueryWrapper<Problem> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper
+                .select(Problem::getId, Problem::getProblemId, Problem::getTitle, Problem::getSource, Problem::getDifficulty)
+                .eq(id != null, Problem::getId, id)
+                .like(StringUtils.isNotBlank(problemId), Problem::getProblemId, problemId)
+                .like(StringUtils.isNotBlank(title), Problem::getTitle, title)
+                .like(StringUtils.isNotBlank(author), Problem::getAuthor, author)
+                .like(StringUtils.isNotBlank(source), Problem::getSource, source)
+                .eq(difficulty != null, Problem::getDifficulty, difficulty)
+                .orderByDesc(Problem::getCreateTime);
+
+        IPage<Problem> page = problemMapper.selectPage(new Page<>(pageNum, pageSize), lambdaQueryWrapper);
+
+        Page<ProblemTitleVO> problemTitleVOPage = new Page<>(page.getCurrent(), page.getSize(), page.getTotal());
+
+        if (CollUtil.isEmpty(page.getRecords())) return ResultUtils.success(problemTitleVOPage);
+
+        // 查询每个题目的tag
+        List<Long> pids = page.getRecords().stream().map(Problem::getId).collect(Collectors.toList());
+
+        Map<Long, List<String>> tagsMap = this.batchGetProblemTags(pids);
+
+        List<ProblemTitleVO> problemTitleVOList = page.getRecords().stream().map(problem -> {
+            ProblemTitleVO vo = ProblemTitleVO.objToVo(problem);
+
+            List<String> problemTags = tagsMap.getOrDefault(problem.getId(), new ArrayList<>());
+            vo.setTagList(problemTags);
+
+            return vo;
+        }).collect(Collectors.toList());
+
+        problemTitleVOPage.setRecords(problemTitleVOList);
+
+        return ResultUtils.success(problemTitleVOPage);
+    }
+
+    public Map<Long, List<String>> batchGetProblemTags(List<Long> pids) {
+        if (CollUtil.isEmpty(pids)) {
+            return new HashMap<>();
         }
-        return ResultUtils.success(problemInformation);
+
+        List<ProblemTagDTO> problemTagDTOS = problemMapper.selectProblemTagsByPids(pids);
+
+        return problemTagDTOS.stream()
+                .collect(Collectors.groupingBy(
+                        ProblemTagDTO::getPid,
+                        Collectors.mapping(ProblemTagDTO::getProblemName, Collectors.toList())
+                ));
     }
 }
-
-
-
 

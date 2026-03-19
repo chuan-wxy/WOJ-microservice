@@ -1,7 +1,10 @@
 package com.chuan.wojwebservice.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.chuan.wojmodel.pojo.dto.problem.ProblemTagDTO;
 import com.chuan.wojmodel.pojo.entity.Problem;
+import org.apache.ibatis.annotations.Param;
+import java.util.List;
 
 /**
 * @author chuan-wxy
@@ -11,6 +14,7 @@ import com.chuan.wojmodel.pojo.entity.Problem;
 */
 public interface ProblemMapper extends BaseMapper<Problem> {
 
+    List<ProblemTagDTO> selectProblemTagsByPids(@Param("pids")List<Long> pids);
 }
 
 

@@ -36,8 +36,6 @@ public class GlobalAuthFilter implements GlobalFilter, Ordered{
 
     private AntPathMatcher antPathMatcher = new AntPathMatcher();
 
-    private String secret = "23e2q1exd2q1e4dxq14edxq2145rq23r5fasdasdq2wed21qed2q1edq21";
-
     @Autowired
     private UrlAuthProperties urlAuthProperties;
 

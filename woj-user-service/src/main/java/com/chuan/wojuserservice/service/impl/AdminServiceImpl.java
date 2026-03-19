@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.chuan.wojcommon.common.BaseResponse;
 import com.chuan.wojcommon.exception.StatusFailException;
 import com.chuan.wojcommon.utils.ResultUtils;
+import com.chuan.wojmodel.pojo.dto.announcement.AnnouncementSearchDTO;
 import com.chuan.wojmodel.pojo.dto.role.UserRoleDTO;
 import com.chuan.wojmodel.pojo.dto.user.UserSearchDTO;
 import com.chuan.wojmodel.pojo.entity.User;
@@ -34,12 +35,6 @@ import java.util.stream.Collectors;
 public class AdminServiceImpl extends ServiceImpl<UserMapper, User> implements AdminService {
 
     @Autowired
-    UserMapper userMapper;
-
-    @Autowired
-    UserService userService;
-
-    @Autowired
     UserRoleMapper userRoleMapper;
 
     /**
@@ -59,27 +54,25 @@ public class AdminServiceImpl extends ServiceImpl<UserMapper, User> implements A
 
     @Override
     public BaseResponse<Page<UserAdminVO>> getUserList(UserSearchDTO userSearchDTO, Integer current, Integer size) throws StatusFailException {
-        if (userSearchDTO == null) throw new StatusFailException("参数错误");
-
-        System.out.println(current+size);
+        if (userSearchDTO == null) {
+            userSearchDTO = new UserSearchDTO();
+        }
 
         IPage<User> page = baseMapper.selectUserListWithDeleted(new Page<>(current, size), userSearchDTO);
 
-        List<User> userList = page.getRecords();
-
         Page<UserAdminVO> userAdminVOPage = new Page<>(page.getCurrent(), page.getSize(), page.getTotal());
 
-        if (CollUtil.isEmpty(userList)) {
+        if (CollUtil.isEmpty(page.getRecords())) {
             return ResultUtils.success(userAdminVOPage);
         }
 
-        List<Long> uids = userList.stream()
+        List<Long> uids = page.getRecords().stream()
                 .map(User::getId)
                 .collect(Collectors.toList());
 
         Map<Long, List<String>> rolesMap = this.batchGetUserRoles(uids);
 
-        List<UserAdminVO> userAdminVOList = userList.stream().map(user -> {
+        List<UserAdminVO> userAdminVOList = page.getRecords().stream().map(user -> {
             UserAdminVO vo = UserAdminVO.objToVo(user);
 
             List<String> userRoles = rolesMap.getOrDefault(user.getId(), new ArrayList<>());
@@ -93,7 +86,6 @@ public class AdminServiceImpl extends ServiceImpl<UserMapper, User> implements A
         return ResultUtils.success(userAdminVOPage);
     }
 
-    @Override
     public Map<Long, List<String>> batchGetUserRoles(List<Long> uids) {
         if (CollUtil.isEmpty(uids)) {
             return new HashMap<>();

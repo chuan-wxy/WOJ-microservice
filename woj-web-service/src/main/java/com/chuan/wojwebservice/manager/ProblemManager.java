@@ -27,28 +27,7 @@ import java.util.stream.Collectors;
 @Component
 public class ProblemManager {
     @Autowired
-    ProblemTagMapper problemMapper;
-
-    @Autowired
     TagMapper tagMapper;
-
-    public void validateSubmitInfo(ProblemAddDTO problemAddDTO) throws StatusFailException {
-
-
-        if (problemAddDTO == null) {
-            log.debug("ProblemServiceImpl---->addProblem()->ProblemManager.validateSubmitInfo---problemAddDTO为空");
-            throw new StatusFailException("problemAddDTO为空");
-        }
-        String problemId = problemAddDTO.getProblemId();
-        String title = problemAddDTO.getTitle();
-        if (problemId.isBlank()) {
-            throw new StatusFailException("problemId为空");
-        }
-        if (title.isBlank()) {
-            throw new StatusFailException("title为空");
-        }
-        this.validateTagList(problemAddDTO.getTagList());
-    }
 
     /**
      * 检查tagList是否为空，tag的名字是否正常，tag是否存在

@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -41,11 +42,6 @@ public class Problem implements Serializable {
     private String author;
 
     /**
-     * 标签
-     */
-    private String tagList;
-
-    /**
      * 单位ms
      */
     private Integer timeLimit;
@@ -64,16 +60,6 @@ public class Problem implements Serializable {
      * 描述
      */
     private String description;
-
-    /**
-     * 输入描述
-     */
-    private String input;
-
-    /**
-     * 输出描述
-     */
-    private String output;
 
     /**
      * 题目来源
@@ -135,7 +121,7 @@ public class Problem implements Serializable {
      */
     private Date updateTime;
 
-    @TableField(exist = false)
+    @Serial
     private static final long serialVersionUID = 1L;
 
 }

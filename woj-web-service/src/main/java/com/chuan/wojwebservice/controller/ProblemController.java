@@ -1,19 +1,21 @@
 package com.chuan.wojwebservice.controller;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.chuan.wojcommon.common.BaseResponse;
 import com.chuan.wojcommon.exception.StatusFailException;
 import com.chuan.wojcommon.exception.StatusSystemErrorException;
 import com.chuan.wojmodel.pojo.dto.problem.ProblemAddDTO;
+import com.chuan.wojmodel.pojo.dto.problem.ProblemSearchDTO;
 import com.chuan.wojmodel.pojo.dto.problem.ProblemUpdateDTO;
-import com.chuan.wojmodel.pojo.entity.ProblemInformation;
+import com.chuan.wojmodel.pojo.entity.ProblemStats;
 import com.chuan.wojmodel.pojo.vo.problem.ProblemTitleVO;
 import com.chuan.wojmodel.pojo.vo.problem.ProblemVO;
 import com.chuan.wojmodel.pojo.vo.problem.TagVO;
 import com.chuan.wojserviceclient.service.UserFeignClient;
 import com.chuan.wojwebservice.service.problem.ProblemService;
 import com.chuan.wojwebservice.service.problem.TagService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -62,14 +64,8 @@ public class ProblemController {
      * @return
      */
     @PostMapping("/add-problem")
-    public BaseResponse<String> addProblem(@RequestBody ProblemAddDTO problemAddDTO) throws StatusFailException, StatusSystemErrorException {
+    public BaseResponse<String> addProblem(@Valid @RequestBody ProblemAddDTO problemAddDTO) throws StatusFailException, StatusSystemErrorException {
         return problemService.addProblem(problemAddDTO);
-    }
-
-    @GetMapping("/get-problemtitle")
-    public BaseResponse<Page<ProblemTitleVO>> getProblemTitle(@RequestParam(value = "size", required = false) Integer size,
-                                                              @RequestParam(value = "current", required = false) Integer current) throws StatusFailException {
-        return problemService.getProblemTitle(current,size);
     }
 
     /**
@@ -80,7 +76,7 @@ public class ProblemController {
      * @throws StatusFailException
      */
     @GetMapping("/get-problem")
-    public BaseResponse<ProblemVO> getProblem(@RequestParam(value = "id") Long id) throws StatusFailException {
+    public BaseResponse<ProblemVO> getProblem(@NotBlank @RequestParam(value = "id") String id) throws StatusFailException {
         return problemService.getProblem(id);
     }
 
@@ -93,49 +89,56 @@ public class ProblemController {
      */
 
     @GetMapping("/get-probleminformation")
-    public BaseResponse<ProblemInformation> getProblemInformation(@RequestParam(value = "id") Long id) throws StatusFailException {
-        return problemService.getProblemInformation(id);
+    public BaseResponse<ProblemStats> getProblemStatistics(@NotBlank @RequestParam(value = "id") String id) throws StatusFailException {
+        return problemService.getProblemStatistics(id);
     }
 
-    /**
-     * 用于全局搜索框
-     *
-     * @param current
-     * @param size
-     * @param text
-     * @return
-     * @throws StatusFailException
-     */
-    @GetMapping("/search-problemtitle")
-    public BaseResponse<Page<ProblemTitleVO>> searchProblemTitleOne(
-                                                              @RequestParam(value = "current") Integer current,
-                                                              @RequestParam(value = "size") Integer size,
-                                                              @RequestParam(value = "text") String text) throws StatusFailException {
-        return problemService.searchProblemTitle(current, size,text);
-    }
+//    /**
+//     * 用于全局搜索框
+//     *
+//     * @param current
+//     * @param size
+//     * @param text
+//     * @return
+//     * @throws StatusFailException
+//     */
+//    @GetMapping("/search-problemtitle")
+//    public BaseResponse<Page<ProblemTitleVO>> searchProblemTitleOne(
+//                                                              @RequestParam(value = "current") Integer current,
+//                                                              @RequestParam(value = "size") Integer size,
+//                                                              @RequestParam(value = "text") String text) throws StatusFailException {
+//        return problemService.searchProblemTitle(current, size,text);
+//    }
 
-    /**
-     * 用于列表页面
-     *
-     * @param current
-     * @param size
-     * @param id
-     * @param tags
-     * @param difficulty
-     * @param title
-     * @return
-     * @throws StatusFailException
-     */
-    @GetMapping("/search-problemtitlelist")
-    public BaseResponse<IPage<ProblemTitleVO>> searchProblemTitleTwo(
-            @RequestParam(value = "current") Integer current,
-            @RequestParam(value = "size") Integer size,
-            @RequestParam(value = "id",required = false) Long id,
-            @RequestParam(value = "tags",required = false) String tags,
-            @RequestParam(value = "difficulty",required = false) String difficulty,
-            @RequestParam(value = "title",required = false) String title) throws StatusFailException {
+//    /**
+//     * 用于列表页面
+//     *
+//     * @param current
+//     * @param size
+//     * @param id
+//     * @param tags
+//     * @param difficulty
+//     * @param title
+//     * @return
+//     * @throws StatusFailException
+//     */
+//    @GetMapping("/search-problemtitlelist")
+//    public BaseResponse<IPage<ProblemTitleVO>> searchProblemTitleTwo(
+//            @RequestParam(value = "current") Integer current,
+//            @RequestParam(value = "size") Integer size,
+//            @RequestParam(value = "id",required = false) Long id,
+//            @RequestParam(value = "tags",required = false) String tags,
+//            @RequestParam(value = "difficulty",required = false) String difficulty,
+//            @RequestParam(value = "title",required = false) String title) throws StatusFailException {
+//
+//        return problemService.searchProblemTitleTwo(current, size,id,tags,difficulty,title);
+//    }
 
-        return problemService.searchProblemTitleTwo(current, size,id,tags,difficulty,title);
+    @PostMapping("/problemtitle-list")
+    public BaseResponse<Page<ProblemTitleVO>> getProblemTitleList(@RequestBody ProblemSearchDTO problemSearchDTO,
+                                                                  @RequestParam("current") Integer current,
+                                                                  @RequestParam("size") Integer size ) {
+        return problemService.getProblemTitleList(problemSearchDTO, current, size);
     }
 
     /**

@@ -11,7 +11,9 @@ import com.chuan.wojmodel.pojo.entity.Tag;
 */
 public interface TagMapper extends BaseMapper<Tag> {
 
-    public long seleceIdByName(String name);
+    Long selectIdByName(String name);
+
+    Tag selectByName(String name);
 
 }
 

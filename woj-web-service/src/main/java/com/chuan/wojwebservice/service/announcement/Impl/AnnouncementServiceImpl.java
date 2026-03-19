@@ -85,7 +85,6 @@ public class AnnouncementServiceImpl extends ServiceImpl<AnnouncementMapper, Ann
             announcementSearchDTO = new AnnouncementSearchDTO();
         }
 
-
         IPage<Announcement> page = announcementMapper.selectAnnouncementList(
                 new Page<>(pageNum, pageSize),
                 announcementSearchDTO

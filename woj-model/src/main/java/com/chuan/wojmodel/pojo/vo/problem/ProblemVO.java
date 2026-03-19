@@ -1,7 +1,10 @@
 package com.chuan.wojmodel.pojo.vo.problem;
+import java.util.ArrayList;
 
+import com.chuan.wojmodel.pojo.entity.Problem;
 import lombok.Data;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 
@@ -58,16 +61,6 @@ public class ProblemVO implements Serializable {
     private String description;
 
     /**
-     * 输入描述
-     */
-    private String input;
-
-    /**
-     * 输出描述
-     */
-    private String output;
-
-    /**
      * 题目来源
      */
     private String source;
@@ -82,5 +75,31 @@ public class ProblemVO implements Serializable {
      */
     private Integer auth;
 
+    @Serial
     private static final long serialVersionUID = 1L;
+
+    /**
+     * 实体类转封装类
+     * tagList 需要手动赋值
+     * @param problem
+     * @return ProblemVO
+     */
+    public static ProblemVO objToVo(Problem problem) {
+        if (problem == null) return null;
+
+        ProblemVO problemVO = new ProblemVO();
+        problemVO.setId(problem.getId());
+        problemVO.setProblemId(problem.getProblemId());
+        problemVO.setTitle(problem.getTitle());
+        problemVO.setAuthor(problem.getAuthor());
+        problemVO.setTimeLimit(problem.getTimeLimit());
+        problemVO.setMemoryLimit(problem.getMemoryLimit());
+        problemVO.setStackLimit(problem.getStackLimit());
+        problemVO.setDescription(problem.getDescription());
+        problemVO.setSource(problem.getSource());
+        problemVO.setDifficulty(problem.getDifficulty());
+        problemVO.setAuth(problem.getAuth());
+
+        return problemVO;
+    }
 }

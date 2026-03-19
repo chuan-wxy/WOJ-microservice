@@ -1,10 +1,13 @@
 package com.chuan.wojmodel.pojo.vo.problem;
+import java.util.ArrayList;
+import java.util.Date;
 
 import cn.hutool.json.JSONUtil;
 import com.chuan.wojmodel.pojo.entity.Problem;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 
@@ -45,24 +48,26 @@ public class ProblemTitleVO implements Serializable {
      */
     private Integer difficulty;
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
+
     /**
-     * 对象转包装类
-     *
+     * 实体类转封装类
+     * tagList 需要手动赋值
      * @param problem
-     * @return
+     * @return ProblemTitleVO
      */
     public static ProblemTitleVO objToVo(Problem problem) {
-        if (problem == null) {
-            return null;
-        }
+        if (problem == null) return null;
+
         ProblemTitleVO problemTitleVO = new ProblemTitleVO();
+        problemTitleVO.setProblemId(problem.getProblemId());
+        problemTitleVO.setTitle(problem.getTitle());
+        problemTitleVO.setId(problem.getId());
+        problemTitleVO.setSource(problem.getSource());
+        problemTitleVO.setDifficulty(problem.getDifficulty());
 
-        BeanUtils.copyProperties(problem, problemTitleVO);
-
-        List<String> tagList = JSONUtil.toList(problem.getTagList(),String.class);
-        problemTitleVO.setTagList(tagList);
         return problemTitleVO;
     }
 }
