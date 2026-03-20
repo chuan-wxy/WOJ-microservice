@@ -12,6 +12,8 @@ import com.chuan.wojmodel.pojo.entity.Problem;
 import com.chuan.wojmodel.pojo.entity.ProblemStats;
 import com.chuan.wojmodel.pojo.vo.problem.ProblemTitleVO;
 import com.chuan.wojmodel.pojo.vo.problem.ProblemVO;
+import com.chuan.wojmodel.pojo.vo.problemStats.ProblemStatsVO;
+
 /**
 * @author chuan-wxy
 * @description 针对表【problem】的数据库操作Service
@@ -25,7 +27,7 @@ public interface ProblemService extends IService<Problem> {
 
     BaseResponse<ProblemVO> getProblem(String id) throws StatusFailException;
 
-    BaseResponse<ProblemStats> getProblemStatistics(String id) throws StatusFailException;
+    BaseResponse<ProblemStatsVO> getProblemStatistics(String id) throws StatusFailException;
 
 
 //    BaseResponse<Page<ProblemTitleVO>> searchProblemTitle(Integer current, Integer size, String text) throws StatusFailException;

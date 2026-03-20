@@ -7,10 +7,10 @@ import com.chuan.wojcommon.exception.StatusSystemErrorException;
 import com.chuan.wojmodel.pojo.dto.problem.ProblemAddDTO;
 import com.chuan.wojmodel.pojo.dto.problem.ProblemSearchDTO;
 import com.chuan.wojmodel.pojo.dto.problem.ProblemUpdateDTO;
-import com.chuan.wojmodel.pojo.entity.ProblemStats;
 import com.chuan.wojmodel.pojo.vo.problem.ProblemTitleVO;
 import com.chuan.wojmodel.pojo.vo.problem.ProblemVO;
 import com.chuan.wojmodel.pojo.vo.problem.TagVO;
+import com.chuan.wojmodel.pojo.vo.problemStats.ProblemStatsVO;
 import com.chuan.wojserviceclient.service.UserFeignClient;
 import com.chuan.wojwebservice.service.ProblemService;
 import com.chuan.wojwebservice.service.TagService;
@@ -89,7 +89,7 @@ public class ProblemController {
      */
 
     @GetMapping("/get-probleminformation")
-    public BaseResponse<ProblemStats> getProblemStatistics(@NotBlank @RequestParam(value = "id") String id) throws StatusFailException {
+    public BaseResponse<ProblemStatsVO> getProblemStatistics(@NotBlank @RequestParam(value = "id") String id) throws StatusFailException {
         return problemService.getProblemStatistics(id);
     }
 

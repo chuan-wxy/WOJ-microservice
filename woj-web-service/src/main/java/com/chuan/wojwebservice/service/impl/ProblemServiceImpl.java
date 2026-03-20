@@ -21,6 +21,8 @@ import com.chuan.wojmodel.pojo.dto.problem.ProblemUpdateDTO;
 import com.chuan.wojmodel.pojo.entity.*;
 import com.chuan.wojmodel.pojo.vo.problem.ProblemTitleVO;
 import com.chuan.wojmodel.pojo.vo.problem.ProblemVO;
+import com.chuan.wojmodel.pojo.vo.problemStats.CharDataVO;
+import com.chuan.wojmodel.pojo.vo.problemStats.ProblemStatsVO;
 import com.chuan.wojwebservice.manager.ProblemManager;
 import com.chuan.wojwebservice.mapper.ProblemMapper;
 import com.chuan.wojwebservice.mapper.ProblemStatsMapper;
@@ -140,7 +142,7 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem>
     }
 
     @Override
-    public BaseResponse<ProblemStats> getProblemStatistics(String id) throws StatusFailException {
+    public BaseResponse<ProblemStatsVO> getProblemStatistics(String id) throws StatusFailException {
         Long pid;
         try {
             pid = Long.parseLong(id);
@@ -150,7 +152,15 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem>
 
         ProblemStats problemStats = problemStatsMapper.getByPid(pid);
 
-        return ResultUtils.success(problemStats);
+        CharDataVO charDataVO = new CharDataVO();
+        ProblemStatsVO problemStatsVO = new ProblemStatsVO();
+
+        BeanUtils.copyProperties(problemStats, problemStatsVO);
+        BeanUtils.copyProperties(problemStats, charDataVO);
+
+        problemStatsVO.setCharDataVO(charDataVO);
+
+        return ResultUtils.success(problemStatsVO);
     }
 
 //    @Override
