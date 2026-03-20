@@ -1,7 +1,6 @@
 package com.chuan.wojuserservice.controller.inner;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.chuan.wojmodel.pojo.entity.User;
 import com.chuan.wojserviceclient.service.UserFeignClient;
 import com.chuan.wojuserservice.service.UserService;
@@ -33,13 +32,11 @@ public class UserInnerController implements UserFeignClient {
     @Override
     @GetMapping("/get/one/by/account")
     public User getByAccount(@RequestParam("account") String account) {
-        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-
         LambdaQueryWrapper<User> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper
                 .select(User::getId)
                 .eq(User::getAccount, account);
 
-        return userService.getOne(queryWrapper);
+        return userService.getOne(lambdaQueryWrapper);
     }
 }
