@@ -19,7 +19,7 @@ public class ProblemSubmit implements Serializable {
     /**
      *
      */
-    @TableId(type = IdType.AUTO)
+    @TableId(type = IdType.ASSIGN_ID)
     private Long id;
 
     /**
@@ -30,7 +30,7 @@ public class ProblemSubmit implements Serializable {
     /**
      * 用户id
      */
-    private String uid;
+    private Long uid;
 
     /**
      * 代码语言
@@ -46,6 +46,12 @@ public class ProblemSubmit implements Serializable {
      * 判题结果
      */
     private String judgeResult;
+
+    /**
+     * 判题状态
+     * （0 - 待判题、1 - 判题中、2 - 判题结束）',
+     */
+    private Integer state;
 
     /**
      * 用时列表
@@ -65,12 +71,12 @@ public class ProblemSubmit implements Serializable {
     /**
      *
      */
-    private Date createtime;
+    private Date createTime;
 
     /**
      *
      */
-    private Date updatetime;
+    private Date updateTime;
 
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
