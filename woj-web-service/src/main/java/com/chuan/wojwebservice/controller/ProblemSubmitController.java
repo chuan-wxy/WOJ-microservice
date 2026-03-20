@@ -7,11 +7,11 @@ import com.chuan.wojcommon.utils.ResultUtils;
 import com.chuan.wojmodel.pojo.dto.problemSubmit.ProblemSubmitAddDTO;
 import com.chuan.wojmodel.pojo.entity.User;
 import com.chuan.wojmodel.pojo.vo.problemSubmit.ProblemSubmitVO;
-import com.chuan.wojmodel.pojo.vo.user.UserLoginVO;
 import com.chuan.wojserviceclient.service.UserFeignClient;
 import com.chuan.wojwebservice.service.ProblemSubmitService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -40,13 +40,9 @@ public class ProblemSubmitController {
     ProblemSubmitService problemSubmitService;
 
     @PostMapping("/doSubmit")
-    public BaseResponse<ProblemSubmitVO> doSubmit(@RequestBody ProblemSubmitAddDTO problemSubmitAddDTO,
+    public BaseResponse<ProblemSubmitVO> doSubmit(@Valid @RequestBody ProblemSubmitAddDTO problemSubmitAddDTO,
                                                   HttpServletRequest request) throws StatusFailException, StatusSystemErrorException, IOException, InterruptedException {
-        final UserLoginVO loginUser = userFeignClient.getLoginUser(request).getData();
-
-        String userAccount = loginUser.getUserInfo().getAccount();
-
-        User user = userFeignClient.getOneByUserAccount(userAccount);
+        User user = userFeignClient.getLoginUser(request).getData();
 
         ProblemSubmitVO problemSubmitVO = problemSubmitService.doQuestionSubmit(problemSubmitAddDTO, user);
 

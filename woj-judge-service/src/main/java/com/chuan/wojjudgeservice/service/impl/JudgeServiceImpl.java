@@ -34,8 +34,8 @@ public class JudgeServiceImpl implements JudgeService {
         if(problemSubmit == null){
             throw new StatusFailException("提交信息不存在");
         }
-        Long questionId = problemSubmit.getPid();
-        Problem problem = webFeignClient.getProblemById(questionId);
+        Long pid = problemSubmit.getPid();
+        Problem problem = webFeignClient.getProblemById(pid);
         
         String language = problemSubmit.getLanguage();
         String code = problemSubmit.getCode();
@@ -45,12 +45,9 @@ public class JudgeServiceImpl implements JudgeService {
                 .language(language)
                 .build();
 
-        if (language.equals("c++"))
-        {
-            return cCodeSandBox.executeCode(executeCodeRequest,problem);
-        }
-        else
-        {
+        if (language.equals("c++")) {
+            return cCodeSandBox.executeCode(executeCodeRequest, problem);
+        } else {
             return new ExecuteCodeResponse(ProblemSubmitResult.DSC,null,null,null,null,"不支持该语言");
         }
     }

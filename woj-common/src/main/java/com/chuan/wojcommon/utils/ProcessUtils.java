@@ -5,6 +5,8 @@ import com.chuan.wojmodel.pojo.ExecuteMessage;
 import org.springframework.util.StopWatch;
 
 import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 /**
  * 进程工具类
@@ -23,6 +25,9 @@ public class ProcessUtils {
      * @return
      */
     public static ExecuteMessage runProcessAndGetMessage(Process runProcess, String opName) {
+        String os = System.getProperty("os.name").toLowerCase();
+        Charset charset = os.contains("win") ? Charset.forName("GBK") : StandardCharsets.UTF_8;
+
         ExecuteMessage executeMessage = new ExecuteMessage();
 
         try {
@@ -33,7 +38,7 @@ public class ProcessUtils {
             if (exitValue == 0) {
                 System.out.println(opName + "成功");
                 // 分批获取进程的正常输出
-                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(runProcess.getInputStream()));
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(runProcess.getInputStream(), charset));
                 StringBuilder compileOutputStringBuilder = new StringBuilder();
                 // 逐行读取
                 String compileOutputLine;
@@ -45,7 +50,7 @@ public class ProcessUtils {
                 // 异常退出
                 System.out.println(opName + "失败，错误码： " + exitValue);
                 // 分批获取进程的正常输出
-                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(runProcess.getInputStream()));
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(runProcess.getInputStream(), charset));
                 StringBuilder compileOutputStringBuilder = new StringBuilder();
                 // 逐行读取
                 String compileOutputLine;
@@ -55,7 +60,7 @@ public class ProcessUtils {
                 executeMessage.setMessage(compileOutputStringBuilder.toString());
 
                 // 分批获取进程的错误输出
-                BufferedReader errorBufferedReader = new BufferedReader(new InputStreamReader(runProcess.getErrorStream()));
+                BufferedReader errorBufferedReader = new BufferedReader(new InputStreamReader(runProcess.getErrorStream(), charset));
                 StringBuilder errorCompileOutputStringBuilder = new StringBuilder();
 
                 // 逐行读取

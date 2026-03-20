@@ -45,15 +45,16 @@ public class ProblemSubmitServiceImpl extends ServiceImpl<ProblemSubmitMapper, P
 
     @Override
     public ProblemSubmitVO doQuestionSubmit(ProblemSubmitAddDTO problemSubmitAddDTO, User user) throws StatusFailException, StatusSystemErrorException, IOException, InterruptedException {
-        if (problemSubmitAddDTO == null || problemSubmitAddDTO.getPid() <= 0) {
-            throw new StatusFailException("请求体为空或题目id为空");
-        }
-        if (problemSubmitAddDTO.getCode() == null || problemSubmitAddDTO.getCode().isEmpty()) {
-            throw new StatusFailException("代码不能为空");
-        }
-
         String language = problemSubmitAddDTO.getLanguage();
-        long questionId = problemSubmitAddDTO.getPid();
+        String code = problemSubmitAddDTO.getCode();
+        String pidStr = problemSubmitAddDTO.getPid();
+
+        Long pid;
+        try {
+            pid = Long.parseLong(pidStr);
+        } catch (NumberFormatException e) {
+            throw new StatusFailException("ID格式错误，必须为数字");
+        }
 
         ProblemSubmitLanguageEnum languageEnum = ProblemSubmitLanguageEnum.getEnumByValue(language);
         if (languageEnum == null) {
@@ -61,26 +62,28 @@ public class ProblemSubmitServiceImpl extends ServiceImpl<ProblemSubmitMapper, P
         }
 
         // 判断题目是否存在，根据类别获取实体
-        Problem problem = problemService.getById(questionId);
+        Problem problem = problemService.getById(pid);
+
         if (problem == null) {
             throw new StatusFailException("题目不存在");
         }
 
         ProblemSubmit problemSubmit = new ProblemSubmit();
-        BeanUtils.copyProperties(problemSubmitAddDTO, problemSubmit);
+        problemSubmit.setPid(pid);
+        problemSubmit.setCode(code);
+        problemSubmit.setLanguage(language);
+        problemSubmit.setUid(user.getId());
 
-        // todo
-        // problemSubmit.setUid(user.getId());
-
-        boolean save = this.save(problemSubmit);
+        if (!this.save(problemSubmit)) {
+            log.debug("[doQuestionSubmit] 保存problemSubmit失败");
+            throw new StatusSystemErrorException("题目提交失败");
+        }
 
         long questionSubmitId = problemSubmit.getId();
 
-        if (!save) {
-            log.debug("[doQuestionSubmit] 保存problemSubmit失败");
-            throw new StatusSystemErrorException("保存失败");
-        }
         ExecuteCodeResponse executeCodeResponse = judgeFeignClient.doJudge(questionSubmitId);
+
+        // todo
 
         System.out.println("沙箱返回结果：" + executeCodeResponse);
 

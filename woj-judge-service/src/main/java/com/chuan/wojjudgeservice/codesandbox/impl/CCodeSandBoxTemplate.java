@@ -22,6 +22,8 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * c/c++代码沙箱
@@ -37,14 +39,14 @@ public abstract class CCodeSandBoxTemplate extends CommonCodeSandboxTemplate imp
     @Value("${path.code.submit-code-path}")
     private String submitCodePath;
 
-    private static String staticJudgeCasePath;
+    private static String STATIC_JUDGE_CASE_PATH;
     private static String staticSubmitCodePath;
 
     private static final String GLOBAL_CPP_CLASS_NAME = "Main.cpp";
 
     @PostConstruct
     public void init() {
-        staticJudgeCasePath = judgeCasePath;
+        STATIC_JUDGE_CASE_PATH = judgeCasePath;
         staticSubmitCodePath = submitCodePath;
     }
 
@@ -76,18 +78,15 @@ public abstract class CCodeSandBoxTemplate extends CommonCodeSandboxTemplate imp
         }
 
         // 2.写文件
-
         String UUID = java.util.UUID.randomUUID().toString();
         String parentPath = staticSubmitCodePath + File.separator + UUID;
         String path = parentPath + File.separator + GLOBAL_CPP_CLASS_NAME;
-
         File userCodeFile = saveCodeToFile(code, parentPath, GLOBAL_CPP_CLASS_NAME);
 
         // 3.编译文件
         ExecuteMessage executeMessage = compileFile(parentPath, path);
         System.out.println("编译结果: " + executeMessage);
-        if (executeMessage.getErrorMessage() != null)
-        {
+        if (executeMessage.getErrorMessage() != null) {
             // 返回编译错误信息
             return new ExecuteCodeResponse(ProblemSubmitResult.CE,null, null,null,null,executeMessage.getErrorMessage());
         }
@@ -97,8 +96,7 @@ public abstract class CCodeSandBoxTemplate extends CommonCodeSandboxTemplate imp
 
         // 5. 文件清理
         boolean b = deleteFile(userCodeFile);
-        if (!b)
-        {
+        if (!b) {
             log.error("deleteFile error, userCodeFilePath = {}", userCodeFile.getAbsolutePath());
         }
 
@@ -132,9 +130,10 @@ public abstract class CCodeSandBoxTemplate extends CommonCodeSandboxTemplate imp
             ExecuteMessage executeMessage = ProcessUtils.runProcessAndGetMessage(compileProcess, "编译");
             // 编译失败
             if(executeMessage.getExitValue() != 0){
+                String realErrorDetail = executeMessage.getErrorMessage();
                 executeMessage.setExitValue(1);
                 executeMessage.setMessage(ProblemSubmitResult.CE);
-                executeMessage.setErrorMessage("编译错误");
+                executeMessage.setErrorMessage("编译错误详情:\n" + realErrorDetail);
             }
             return executeMessage;
         } catch (Exception e) {
@@ -153,122 +152,92 @@ public abstract class CCodeSandBoxTemplate extends CommonCodeSandboxTemplate imp
      * @param userCodeFile
      * @return
      */
-    public ExecuteCodeResponse runFile(File userCodeFile,String parentPath,String questionId,long needTime) throws IOException
-    {
+    // todo 实现linux系统下的计时
+    public ExecuteCodeResponse runFile(File userCodeFile,String parentPath,String questionId,long needTime) throws IOException {
         ExecuteCodeResponse executeCodeResponse = new ExecuteCodeResponse();
         List<Long> timeList = new ArrayList<>();
+
         for (int i = 0; i < 10 ; i++) {
+            String inputPath = STATIC_JUDGE_CASE_PATH + File.separator + questionId + File.separator + "test" + i + ".in";
+            String outputPath = parentPath + File.separator + "test" + i + ".out";
+            String answerPath = STATIC_JUDGE_CASE_PATH + File.separator + questionId + File.separator + "test" + i + ".out";
+
+
+            ProcessBuilder builder = new ProcessBuilder(parentPath + File.separator + "Main.exe");
+
+            builder.redirectInput(new File(inputPath));
+            builder.redirectOutput(new File(outputPath));
+            builder.redirectErrorStream(true); // 将错误输出合并到标准输出
+
             long startTime = System.currentTimeMillis();
+            Process process = null;
+
             try {
-                ProcessBuilder builder = new ProcessBuilder(parentPath + File.separator + "Main.exe");
-                String inputFilePath = String.format(staticJudgeCasePath+File.separator+questionId+File.separator+"test%d.in", i);
-                String outputFilePath = String.format(parentPath+File.separator+"test%d.out",i);
-                String answerFilePath = String.format(staticJudgeCasePath+File.separator+questionId + File.separator+"test%d.out", i);
+                process = builder.start();
+                /*
+                  等待运行，超时控制
+                  程序执行到这一行，线程会停在这里
+                  如果程序在第规定时间跑完了，这个方法会立刻返回 true
+                  如果超时程序还没动静，这个方法会准时返回 false
+                 */
+                boolean finished = process.waitFor(needTime, TimeUnit.MILLISECONDS);
+                long duration = System.currentTimeMillis() - startTime;
 
-                builder.redirectInput(new File(inputFilePath));
-                builder.redirectOutput(new File(outputFilePath));
-
-                Process process = builder.start();
-
-                new Thread(() -> {
-                    try {
-                        Thread.sleep(needTime + 2000);
-                        process.destroy();
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
-                }).start();
-
-                int exitCode = process.waitFor();
-                System.out.println(process.getErrorStream());
-
-                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-                List<String> outputStrList = new ArrayList<>();
-                // 逐行读取
-                String compileOutputLine;
-                while ((compileOutputLine = bufferedReader.readLine()) != null)
-                {
-                    outputStrList.add(compileOutputLine);
-                }
-                System.out.println(StringUtils.join(outputStrList, "\n"));
-
-
-                // 分批获取进程的错误输出
-                BufferedReader errorBufferedReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-                // 逐行读取
-                List<String> errorOutputStrList = new ArrayList<>();
-                // 逐行读取
-                String errorCompileOutputLine;
-                while ((errorCompileOutputLine = errorBufferedReader.readLine()) != null)
-                {
-                    errorOutputStrList.add(errorCompileOutputLine);
-                }
-
-                System.out.println(StringUtils.join(errorOutputStrList, "\n"));
-
-
-
-
-
-                long endTime = System.currentTimeMillis();
-
-                long duration = endTime - startTime;
-                //判断是否超时
-                if (duration > needTime) {
+                if (!finished) {
+                    // 超时强制杀死
+                    process.destroyForcibly();
                     executeCodeResponse.setResult(ProblemSubmitResult.TLE);
                     return executeCodeResponse;
                 }
-                timeList.add(duration);
-                
-                System.out.println("样例" + i+1 +"运行时间:" + duration);
 
-                BufferedReader br1 = null;
-                BufferedReader br2 = null;
-                //判断结果是否正确
-                try {
-                    br1 = new BufferedReader(new FileReader(answerFilePath));
-                    br2 = new BufferedReader(new FileReader(outputFilePath));
-
-                    String line1;
-                    String line2;
-
-                    while ((line1 = br1.readLine()) != null && (line2 = br2.readLine()) != null) {
-                        if (!line1.equals(line2)) {
-                            executeCodeResponse.setResult(ProblemSubmitResult.WA);
-                            return executeCodeResponse;
-                        }
-                    }
-                    line2 = br2.readLine();
-                    // 检查是否两个文件都同时到达了末尾
-                    if (line1 != null || line2 != null) {
-                        //debug
-                        System.out.println("没有同时到达末尾");
-                        executeCodeResponse.setResult(ProblemSubmitResult.WA);
-                        return executeCodeResponse;
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    throw new StatusFailException("其他错误");
-                } finally {
-                    if (br1 != null) {
-                        try {
-                            br1.close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    if (br2 != null) {
-                        try {
-                            br2.close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
+                if (process.exitValue() != 0) {
+                    // 运行错误（如空指针、溢出）
+                    executeCodeResponse.setResult(ProblemSubmitResult.RE);
+                    return executeCodeResponse;
                 }
-            } catch (IOException | InterruptedException | StatusFailException e) {
+
+                if (!compareAnswer(answerPath, outputPath)) {
+                    executeCodeResponse.setResult(ProblemSubmitResult.WA); // Wrong Answer
+                    return executeCodeResponse;
+                }
+
+                timeList.add(duration);
+                //debugger
+                System.out.println("样例" + i + "用时：" + duration);
+
+            } catch (InterruptedException e) {
                 throw new RuntimeException(e);
+            } finally {
+                if (process != null) {
+                    process.destroy();
+                }
             }
         }
+        executeCodeResponse.setResult(ProblemSubmitResult.AC);
         return executeCodeResponse;
     }
+
+    private boolean compareAnswer(String answerPath, String outputPath) {
+        try (BufferedReader br1 = new BufferedReader(new FileReader(answerPath));
+             BufferedReader br2 = new BufferedReader(new FileReader(outputPath))) {
+
+            List<String> lines1 = br1.lines().map(String::stripTrailing).collect(Collectors.toList());
+            List<String> lines2 = br2.lines().map(String::stripTrailing).collect(Collectors.toList());
+
+            // 移除列表末尾的空行（OJ 通用规则）
+            while (!lines1.isEmpty() && lines1.get(lines1.size() - 1).isEmpty()) lines1.remove(lines1.size() - 1);
+            while (!lines2.isEmpty() && lines2.get(lines2.size() - 1).isEmpty()) lines2.remove(lines2.size() - 1);
+
+            if (lines1.size() != lines2.size()) return false;
+
+            for (int i = 0; i < lines1.size(); i++) {
+                if (!lines1.get(i).equals(lines2.get(i))) return false;
+            }
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }
+
