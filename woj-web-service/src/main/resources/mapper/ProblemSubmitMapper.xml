@@ -7,15 +7,16 @@
     <resultMap id="BaseResultMap" type="com.chuan.wojmodel.pojo.entity.ProblemSubmit">
         <id property="id" column="id" jdbcType="BIGINT"/>
         <result property="pid" column="pid" jdbcType="BIGINT"/>
-        <result property="uid" column="uid" jdbcType="VARCHAR"/>
+        <result property="uid" column="uid" jdbcType="BIGINT"/>
         <result property="language" column="language" jdbcType="VARCHAR"/>
         <result property="code" column="code" jdbcType="VARCHAR"/>
-        <result property="judgeresult" column="judgeResult" jdbcType="VARCHAR"/>
-        <result property="timelist" column="timeList" jdbcType="VARCHAR"/>
-        <result property="memorylist" column="memoryList" jdbcType="VARCHAR"/>
-        <result property="stacklist" column="stackList" jdbcType="VARCHAR"/>
-        <result property="createtime" column="createTime" jdbcType="TIMESTAMP"/>
-        <result property="updatetime" column="updateTime" jdbcType="TIMESTAMP"/>
+        <result property="judgeResult" column="judge_result" jdbcType="VARCHAR"/>
+        <result property="state" column="state" jdbcType="INTEGER"/>
+        <result property="timeList" column="time_list" jdbcType="VARCHAR"/>
+        <result property="memoryList" column="memory_list" jdbcType="VARCHAR"/>
+        <result property="stackList" column="stack_list" jdbcType="VARCHAR"/>
+        <result property="createTime" column="createime" jdbcType="TIMESTAMP"/>
+        <result property="updateTime" column="updateTime" jdbcType="TIMESTAMP"/>
     </resultMap>
 
     <sql id="Base_Column_List">
