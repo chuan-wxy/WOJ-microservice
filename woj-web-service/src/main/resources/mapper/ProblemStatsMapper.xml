@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chuan.wojwebservice.mapper.ProblemStatsMapper">
+
+    <resultMap id="BaseResultMap" type="com.chuan.wojmodel.pojo.entity.ProblemStats">
+            <id property="pid" column="pid" jdbcType="BIGINT"/>
+            <result property="acCount" column="ac_count" jdbcType="INTEGER"/>
+            <result property="waCount" column="wa_count" jdbcType="INTEGER"/>
+            <result property="tleCount" column="tle_count" jdbcType="INTEGER"/>
+            <result property="mleCount" column="mle_count" jdbcType="INTEGER"/>
+            <result property="reCount" column="re_count" jdbcType="INTEGER"/>
+            <result property="ceCount" column="ce_count" jdbcType="INTEGER"/>
+            <result property="seCount" column="se_count" jdbcType="INTEGER"/>
+            <result property="totalSubmissions" column="total_submissions" jdbcType="INTEGER"/>
+            <result property="totalAttemptedUsers" column="total_attempted_users" jdbcType="INTEGER"/>
+            <result property="solvedUsers" column="solved_users" jdbcType="INTEGER"/>
+            <result property="lastSubmittedAt" column="last_submitted_at" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        pid,ac_count,wa_count,tle_count,mle_count,re_count,
+        ce_count,se_count,total_submissions,total_attempted_users,solved_users,
+        last_submitted_at
+    </sql>
+    <select id="getByPid" resultType="com.chuan.wojmodel.pojo.entity.ProblemStats">
+        SELECT * FROM problem_stats WHERE pid = #{pid}
+    </select>
+</mapper>
