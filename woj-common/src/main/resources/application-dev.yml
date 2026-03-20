@@ -57,12 +57,16 @@ logging:
     org.springframework.jdbc.support.JdbcTransactionManager: debug
 
 #自定义代码代码沙箱的输出地址，默认为false，使用项目目录下的questionCode作为文件的输出地址，开启后将使用指定的地址
+storage:
+  base-path: "D:\\woj"
+
 path:
   code:
-    submit-code-path: "D:\\Desktop\\WOJ\\NEW\\WOJ\\WOJ\\submitcode"
-    judgecase-path: "D:\\Desktop\\WOJ\\NEW\\WOJ\\WOJ\\judgecase"
+    submit-code-path: "${storage.base-path}\\submitcode"
+    judgecase-path: "${storage.base-path}\\judgecase"
   avatar:
-    user-avatar-path: "D:\\Desktop\\WOJ\\NEW\\WOJ\\WOJ\\avatar\\user"
-    course-avatar-path: "D:\\Desktop\\WOJ\\NEW\\WOJ\\WOJ\\avatar\\course"
-    activity-avatar-path: "D:\\Desktop\\WOJ\\NEW\\WOJ\\WOJ\\avatar\\activity"
+    user-avatar-path: "${storage.base-path}\\avatar\\user"
+    course-avatar-path: "${storage.base-path}\\\\avatar\\course"
+    activity-avatar-path: "${storage.base-path}\\\\avatar\\activity"
+
 
