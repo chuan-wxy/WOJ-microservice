@@ -2,11 +2,10 @@ package com.chuan.wojserviceclient.service;
 
 import com.chuan.wojcommon.common.BaseResponse;
 import com.chuan.wojcommon.exception.StatusFailException;
+import com.chuan.wojcommon.exception.StatusForbiddenException;
 import com.chuan.wojcommon.utils.JwtUtil;
 import com.chuan.wojcommon.utils.ResultUtils;
 import com.chuan.wojmodel.pojo.entity.User;
-import com.chuan.wojmodel.pojo.vo.user.UserLoginVO;
-import com.chuan.wojmodel.pojo.vo.user.UserVO;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.BeanUtils;
@@ -29,36 +28,22 @@ public interface UserFeignClient {
     @GetMapping("/get/by/id")
     User getById(@RequestParam("id") String id);
 
-    @GetMapping("/get/by/useraccount")
-    User getByAccount(@RequestParam("userAccount") String userAccount);
+    @GetMapping("/get/one/by/account")
+    User getByAccount(@RequestParam("account") String account);
 
-    @GetMapping("/get/one/by/useraccount")
-    User getOneByUserAccount(@RequestParam("userAccount") String userAccount);
-
-    default BaseResponse<UserLoginVO> getLoginUser(HttpServletRequest request) throws StatusFailException {
-
+    default BaseResponse<User> getLoginUser(HttpServletRequest request) throws StatusFailException {
         String token = request.getHeader("Authorization");
 
         Claims claimByToken = JwtUtil.getClaimByToken(token);
 
-        String userAccount =(String) claimByToken.get("userAccount");
+        String account =(String) claimByToken.get("userAccount");
 
-        if (userAccount == null || userAccount.isBlank() ){
-            throw new StatusFailException("未登录");
+        User user = this.getByAccount(account);
+
+        if(user == null) {
+            throw new StatusFailException("账号认证错误");
         }
 
-        User user = this.getByAccount(userAccount);
-
-        if(user==null || user.getAccount().isBlank()){
-            throw new StatusFailException("未登录");
-        }
-
-        UserLoginVO userLoginVO = new UserLoginVO();
-        UserVO userVO = new UserVO();
-
-        BeanUtils.copyProperties(user,userVO);
-        userLoginVO.setUserInfo(userVO);
-
-        return ResultUtils.success(userLoginVO);
+        return ResultUtils.success(user);
     };
 }

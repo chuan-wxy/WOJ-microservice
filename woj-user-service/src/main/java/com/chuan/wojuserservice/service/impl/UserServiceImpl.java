@@ -403,15 +403,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     }
 
-    @Override
-    public User getUserByAccount(String account) {
-        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("userAccount",account);
-
-        User user = userMapper.selectOne(queryWrapper);
-
-        return user;
-    }
 
     /**
      *

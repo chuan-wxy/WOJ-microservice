@@ -36,7 +36,5 @@ public interface UserService extends IService<User> {
 
     BaseResponse<UserLoginVO> getLoginUser(HttpServletRequest request) throws StatusFailException;
 
-    User getUserByAccount(String account);
-
     BaseResponse<Boolean> checkJWT(String JWT);
 }
