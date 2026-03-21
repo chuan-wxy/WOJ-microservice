@@ -68,7 +68,7 @@ public abstract class CCodeSandBoxTemplate extends CommonCodeSandboxTemplate imp
 
         String code = executeCodeRequest.getCode();
 
-        // 1.黑名单校验
+        // 黑名单校验
         WordTree wordTree = new WordTree();
         wordTree.addWords(blackList);
         FoundWord foundWord = WORD_TREE.matchWord(code);
@@ -77,13 +77,13 @@ public abstract class CCodeSandBoxTemplate extends CommonCodeSandboxTemplate imp
             return new ExecuteCodeResponse(ProblemSubmitResult.DSC,null, null,null,null,"包含禁止词：" + foundWord.getFoundWord());
         }
 
-        // 2.写文件
+        // 写文件
         String UUID = java.util.UUID.randomUUID().toString();
         String parentPath = staticSubmitCodePath + File.separator + UUID;
         String path = parentPath + File.separator + GLOBAL_CPP_CLASS_NAME;
         File userCodeFile = saveCodeToFile(code, parentPath, GLOBAL_CPP_CLASS_NAME);
 
-        // 3.编译文件
+        // 编译文件
         ExecuteMessage executeMessage = compileFile(parentPath, path);
         System.out.println("编译结果: " + executeMessage);
         if (executeMessage.getErrorMessage() != null) {
@@ -91,10 +91,10 @@ public abstract class CCodeSandBoxTemplate extends CommonCodeSandboxTemplate imp
             return new ExecuteCodeResponse(ProblemSubmitResult.CE,null, null,null,null,executeMessage.getErrorMessage());
         }
 
-        // 4.执行代码
-        ExecuteCodeResponse executeCodeResponse = runFile(userCodeFile, parentPath, questionId, needTime);
+        // 执行代码
+        ExecuteCodeResponse executeCodeResponse = runFile(parentPath, questionId, needTime);
 
-        // 5. 文件清理
+        // 文件清理
         boolean b = deleteFile(userCodeFile);
         if (!b) {
             log.error("deleteFile error, userCodeFilePath = {}", userCodeFile.getAbsolutePath());
@@ -108,7 +108,7 @@ public abstract class CCodeSandBoxTemplate extends CommonCodeSandboxTemplate imp
      * @param
      * @return
      */
-    public ExecuteMessage compileFile(String parentPath, String path) throws IOException
+    public ExecuteMessage compileFile(String parentPath, String path)
     {
         String shell = SystemUtil.getShell();
 
@@ -149,11 +149,11 @@ public abstract class CCodeSandBoxTemplate extends CommonCodeSandboxTemplate imp
     /**
      * 执行代码
      *
-     * @param userCodeFile
+     * @param
      * @return
      */
     // todo 实现linux系统下的计时
-    public ExecuteCodeResponse runFile(File userCodeFile,String parentPath,String questionId,long needTime) throws IOException {
+    public ExecuteCodeResponse runFile(String parentPath,String questionId,long needTime) throws IOException {
         ExecuteCodeResponse executeCodeResponse = new ExecuteCodeResponse();
         List<Long> timeList = new ArrayList<>();
 

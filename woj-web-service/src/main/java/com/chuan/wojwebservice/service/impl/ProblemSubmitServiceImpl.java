@@ -1,18 +1,23 @@
 package com.chuan.wojwebservice.service.impl;
 
 import cn.hutool.json.JSONUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.chuan.wojcommon.common.enums.ProblemSubmitLanguageEnum;
+import com.chuan.wojcommon.common.enums.ProblemSubmitStateEnum;
+import com.chuan.wojcommon.constant.ProblemSubmitResult;
 import com.chuan.wojcommon.exception.StatusFailException;
 import com.chuan.wojcommon.exception.StatusSystemErrorException;
 import com.chuan.wojmodel.pojo.codesandbox.ExecuteCodeResponse;
 import com.chuan.wojmodel.pojo.dto.problemSubmit.ProblemSubmitAddDTO;
 import com.chuan.wojmodel.pojo.entity.Problem;
+import com.chuan.wojmodel.pojo.entity.ProblemStats;
 import com.chuan.wojmodel.pojo.entity.ProblemSubmit;
 import com.chuan.wojmodel.pojo.entity.User;
 import com.chuan.wojmodel.pojo.vo.problemSubmit.ProblemSubmitVO;
 import com.chuan.wojserviceclient.service.JudgeFeignClient;
+import com.chuan.wojwebservice.mapper.ProblemStatsMapper;
 import com.chuan.wojwebservice.mapper.ProblemSubmitMapper;
 import com.chuan.wojwebservice.service.ProblemService;
 import com.chuan.wojwebservice.service.ProblemSubmitService;
@@ -22,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.Objects;
 
 /**
 * @author chuan-wxy
@@ -39,6 +45,8 @@ public class ProblemSubmitServiceImpl extends ServiceImpl<ProblemSubmitMapper, P
     @Autowired
     private ProblemSubmitMapper problemSubmitMapper;
 
+    @Autowired
+    private ProblemStatsMapper problemStatsMapper;
 
     @Autowired
     private JudgeFeignClient judgeFeignClient;
@@ -81,52 +89,48 @@ public class ProblemSubmitServiceImpl extends ServiceImpl<ProblemSubmitMapper, P
 
         long questionSubmitId = problemSubmit.getId();
 
+        problemSubmit.setState(ProblemSubmitStateEnum.JUDGING.getCode());
+        this.updateById(problemSubmit);
         ExecuteCodeResponse executeCodeResponse = judgeFeignClient.doJudge(questionSubmitId);
 
-        // todo
+        problemSubmit.setState(ProblemSubmitStateEnum.ACCEPTED.getCode());
+        problemSubmit.setJudgeResult(executeCodeResponse.getResult());
+        problemSubmit.setTimeList(JSONUtil.toJsonStr(executeCodeResponse.getTimeList()));
+        problemSubmit.setMemoryList(JSONUtil.toJsonStr(executeCodeResponse.getMemoryList()));
+        problemSubmitMapper.updateById(problemSubmit);
 
-        System.out.println("沙箱返回结果：" + executeCodeResponse);
 
-        // 更新状态
-        ProblemSubmit problemSubmitUpdate = new ProblemSubmit();
-        problemSubmitUpdate.setId(questionSubmitId);
-        problemSubmitUpdate.setJudgeResult(executeCodeResponse.getResult());
-        problemSubmitUpdate.setTimeList(JSONUtil.toJsonStr(executeCodeResponse.getTimeList()));
-        problemSubmitUpdate.setMemoryList(JSONUtil.toJsonStr(executeCodeResponse.getMemoryList()));
+        LambdaQueryWrapper<ProblemStats> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(ProblemStats::getPid, pid);
+        ProblemStats problemStats = problemStatsMapper.selectOne(lambdaQueryWrapper);
 
-        QueryWrapper<ProblemSubmit> ProblemSubmitQueryWrapper = new QueryWrapper<>();
-        ProblemSubmitQueryWrapper.eq("id", questionSubmitId);
-        problemSubmitMapper.update(problemSubmit, ProblemSubmitQueryWrapper);
+        problemStats.setTotalSubmissions(problemStats.getTotalSubmissions() + 1);
 
         // todo
-//        QueryWrapper<ProblemInformation> queryWrapper = new QueryWrapper<>();
-//        queryWrapper.eq("pid", problemSubmit.getPid());
-        // ProblemInformation problemInformation = problemInformationMapper.selectOne(queryWrapper);
-//        problemInformation.setSubnum(problemInformation.getSubnum() + 1);
-//
-//        if (Objects.equals(executeCodeResponse.getResult(), ProblemSubmitResult.AC)) {
-//            problemInformation.setAcnum(problemInformation.getAcnum() + 1);
-//        } else if (Objects.equals(executeCodeResponse.getResult(), ProblemSubmitResult.WA)){
-//            problemInformation.setWanum(problemInformation.getWanum() + 1);
-//        } else if(Objects.equals(executeCodeResponse.getResult(), ProblemSubmitResult.TLE)){
-//            problemInformation.setTlenum(problemInformation.getTlenum() + 1);
-//        } else if (Objects.equals(executeCodeResponse.getResult(), ProblemSubmitResult.MLE)){
-//            problemInformation.setMlenum(problemInformation.getMlenum() + 1);
-//        } else if (Objects.equals(executeCodeResponse.getResult(), ProblemSubmitResult.RE)){
-//            problemInformation.setRenum(problemInformation.getRenum() + 1);
-//        } else if (Objects.equals(executeCodeResponse.getResult(), ProblemSubmitResult.CE)){
-//            problemInformation.setCenum(problemInformation.getCenum() + 1);
-//        } else if (Objects.equals(executeCodeResponse.getResult(), ProblemSubmitResult.SF)) {
-//            problemInformation.setSfnum(problemInformation.getSfnum() + 1);
-//        } else {
-//            log.error("[doQuestionSubmit] 状态错误");
-//        }
-//
-//        problemInformationMapper.update(problemInformation,queryWrapper);
+
+        if (Objects.equals(executeCodeResponse.getResult(), ProblemSubmitResult.AC)) {
+            problemStats.setAcCount(problemStats.getAcCount() + 1);
+        } else if (Objects.equals(executeCodeResponse.getResult(), ProblemSubmitResult.WA)){
+            problemStats.setWaCount(problemStats.getWaCount() + 1);
+        } else if(Objects.equals(executeCodeResponse.getResult(), ProblemSubmitResult.TLE)){
+            problemStats.setTleCount(problemStats.getTleCount() + 1);
+        } else if (Objects.equals(executeCodeResponse.getResult(), ProblemSubmitResult.MLE)){
+            problemStats.setMleCount(problemStats.getMleCount() + 1);
+        } else if (Objects.equals(executeCodeResponse.getResult(), ProblemSubmitResult.RE)){
+            problemStats.setReCount(problemStats.getReCount() + 1);
+        } else if (Objects.equals(executeCodeResponse.getResult(), ProblemSubmitResult.CE)){
+            problemStats.setCeCount(problemStats.getCeCount() + 1);
+        } else if (Objects.equals(executeCodeResponse.getResult(), ProblemSubmitResult.SF)) {
+            problemStats.setSeCount(problemStats.getSeCount() + 1);
+        } else {
+            log.error("[doQuestionSubmit] 状态错误");
+        }
+
+        problemStatsMapper.updateById(problemStats);
 
         ProblemSubmitVO problemSubmitVO = new ProblemSubmitVO();
-        BeanUtils.copyProperties(problemSubmitUpdate, problemSubmitVO);
-        problemSubmitVO.setResult(problemSubmitUpdate.getJudgeResult());
+        BeanUtils.copyProperties(problemSubmit, problemSubmitVO);
+        problemSubmitVO.setResult(problemSubmit.getJudgeResult());
 
         return problemSubmitVO;
     }

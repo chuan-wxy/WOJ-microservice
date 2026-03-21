@@ -2,6 +2,7 @@ package com.chuan.wojmodel.pojo.vo.problemSubmit;
 
 import lombok.Data;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 
@@ -12,24 +13,21 @@ import java.util.List;
  */
 @Data
 public class ProblemSubmitVO  implements Serializable {
-    /**
-     * id
-     */
+
     private Long id;
+
     private String result;
+
     private List<Long> timeLit;
+
     private List<Long> memoryLit;
+
     private List<Long> stackLit;
 
-    /**
-     * 题目id
-     */
     private Long pid;
 
-    /**
-     * 用户id
-     */
     private String uid;
 
+    @Serial
     private static final long serialVersionUID = 1L;
 }

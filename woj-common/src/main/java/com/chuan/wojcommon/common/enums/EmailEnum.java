@@ -8,7 +8,6 @@ package com.chuan.wojcommon.common.enums;
  * @Description: 邮件任务的一些常量
  */
 public enum EmailEnum {
-
     OJ_URL("OJ_UR"),
     OJ_NAME("OJ_NAME"),
     OJ_SHORT_NAME("OJ_SHORT_NAME"),

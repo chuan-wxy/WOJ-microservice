@@ -1,5 +1,6 @@
 package com.chuan.wojjudgeservice.service.impl;
 
+import com.chuan.wojcommon.common.enums.UserRoleEnum;
 import com.chuan.wojcommon.constant.ProblemSubmitResult;
 import com.chuan.wojcommon.exception.StatusFailException;
 import com.chuan.wojjudgeservice.codesandbox.impl.CCodeSandBox;
