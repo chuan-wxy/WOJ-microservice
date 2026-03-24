@@ -2,7 +2,7 @@ package com.chuan.wojwebservice.mapper;
 
 import com.chuan.wojmodel.pojo.entity.ProblemStats;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-
+import org.apache.ibatis.annotations.Param;
 /**
 * @author 31539
 * @description 针对表【problem_stats】的数据库操作Mapper
@@ -12,6 +12,8 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 public interface ProblemStatsMapper extends BaseMapper<ProblemStats> {
 
     ProblemStats getByPid(long pid);
+
+    int incrementStats(@Param("pid") Long pid, @Param("result") String result);
 }
 
 

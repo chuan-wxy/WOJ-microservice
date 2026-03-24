@@ -1,5 +1,6 @@
 package com.chuan.wojwebservice.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.chuan.wojcommon.common.BaseResponse;
@@ -29,13 +30,7 @@ public interface ProblemService extends IService<Problem> {
 
     BaseResponse<ProblemStatsVO> getProblemStatistics(String id) throws StatusFailException;
 
-
-//    BaseResponse<Page<ProblemTitleVO>> searchProblemTitle(Integer current, Integer size, String text) throws StatusFailException;
-//
-//    BaseResponse<IPage<ProblemTitleVO>> searchProblemTitleTwo(Integer current, Integer size, Long id, String tags, String difficulty, String title) throws StatusFailException;
-
     BaseResponse<String> updateProblem(ProblemUpdateDTO problemUpdateDTO) throws StatusFailException;
-
 
     BaseResponse<Page<ProblemTitleVO>> getProblemTitleList(ProblemSearchDTO problemSearchDTO, Integer current, Integer size);
 }

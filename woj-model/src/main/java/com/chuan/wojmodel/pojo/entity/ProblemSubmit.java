@@ -48,6 +48,11 @@ public class ProblemSubmit implements Serializable {
     private String judgeResult;
 
     /**
+     * 判题信息
+     */
+    private String judgeInfo;
+
+    /**
      * 判题状态
      * （0 - 待判题、1 - 判题中、2 - 判题结束）',
      */

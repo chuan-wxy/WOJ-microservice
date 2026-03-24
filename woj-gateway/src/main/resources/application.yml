@@ -44,6 +44,10 @@ spring:
           uri: lb://woj-judge-service
           predicates:
             - Path=/api/judge/**
+        - id: woj-ai-service
+          uri: lb://woj-ai-service
+          predicates:
+            - Path=/api/ai/**
 server:
   port: 8101
 
@@ -65,6 +69,8 @@ knife4j:
           group-name: woj-web-service
         woj-judge-service:
           group-name: woj-judge-service
+        woj-ai-service:
+          group-name: woj-ai-service
 
 emailUtil:
   hostName: smtp.qq.com

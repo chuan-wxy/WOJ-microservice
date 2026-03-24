@@ -11,8 +11,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.chuan.wojcommon.common.BaseResponse;
 import com.chuan.wojcommon.exception.StatusFailException;
-import com.chuan.wojcommon.exception.StatusSystemErrorException;
-import com.chuan.wojcommon.utils.DataExtractorUtil;
 import com.chuan.wojcommon.utils.ResultUtils;
 import com.chuan.wojmodel.pojo.dto.problem.ProblemAddDTO;
 import com.chuan.wojmodel.pojo.dto.problem.ProblemSearchDTO;
@@ -57,12 +55,9 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem>
     @Autowired
     private ProblemStatsMapper problemStatsMapper;
 
-    @Autowired
-    DataExtractorUtil dataExtractorUtil;
-
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public BaseResponse<String> addProblem(ProblemAddDTO problemAddDTO) throws StatusFailException, StatusSystemErrorException {
+    public BaseResponse<String> addProblem(ProblemAddDTO problemAddDTO) throws StatusFailException {
         Problem problem = new Problem();
         BeanUtils.copyProperties(problemAddDTO, problem);
 
@@ -163,31 +158,6 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem>
         return ResultUtils.success(problemStatsVO);
     }
 
-//    @Override
-//    public BaseResponse<Page<ProblemTitleVO>> searchProblemTitle(Integer current, Integer size, String text) throws StatusFailException {
-//        if (current == null || size == null) {
-//            throw new StatusFailException("current和size不能为空");
-//        }
-//        dataExtractorUtil.doExtraction(text);
-//        List<String> difficulty = dataExtractorUtil.getDifficulties();
-//        List<String> tags = dataExtractorUtil.getTags();
-//        List<String> keyword = dataExtractorUtil.getKeywords();
-//        // 题库页普通查询
-//        Page<Problem> page = this.page(new Page<>(current, size),
-//                problemManager.getQueryWrapper(keyword, tags, difficulty));
-//        return ResultUtils.success(problemManager.getProblemTitleVOPage(page));
-//    }
-
-//    @Override
-//    public BaseResponse<IPage<ProblemTitleVO>> searchProblemTitleTwo(Integer current, Integer size, Long id, String tags, String difficulty, String title) throws StatusFailException {
-//        if (current == null || size == null) {
-//            throw new StatusFailException("current和size不能为空");
-//        }
-//
-//        Page<Problem> page = this.page(new Page<>(current, size),
-//                problemManager.getQueryWrapperTwo(id, tags, difficulty, title));
-//        return ResultUtils.success(problemManager.getProblemTitleVOPage(page));
-//    }
 
     @Override
     public BaseResponse<String> updateProblem(ProblemUpdateDTO problemUpdateDTO) throws StatusFailException {

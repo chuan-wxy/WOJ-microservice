@@ -3,6 +3,7 @@ package com.chuan.wojjudgeservice.service.impl;
 import com.chuan.wojcommon.common.enums.UserRoleEnum;
 import com.chuan.wojcommon.constant.ProblemSubmitResult;
 import com.chuan.wojcommon.exception.StatusFailException;
+import com.chuan.wojcommon.exception.StatusSystemErrorException;
 import com.chuan.wojjudgeservice.codesandbox.impl.CCodeSandBox;
 import com.chuan.wojjudgeservice.service.JudgeService;
 import com.chuan.wojmodel.pojo.codesandbox.ExecuteCodeRequest;
@@ -30,11 +31,10 @@ public class JudgeServiceImpl implements JudgeService {
     private CCodeSandBox cCodeSandBox;
 
     @Override
-    public ExecuteCodeResponse doJudge(long problemSubmitId) throws StatusFailException, IOException, InterruptedException {
+    public ExecuteCodeResponse doJudge(long problemSubmitId) throws StatusFailException, IOException, InterruptedException, StatusSystemErrorException {
         ProblemSubmit problemSubmit = webFeignClient.getProblemSubmitById(problemSubmitId);
-        if(problemSubmit == null){
-            throw new StatusFailException("提交信息不存在");
-        }
+        if(problemSubmit == null) throw new StatusFailException("提交信息不存在");
+
         Long pid = problemSubmit.getPid();
         Problem problem = webFeignClient.getProblemById(pid);
         
@@ -49,7 +49,8 @@ public class JudgeServiceImpl implements JudgeService {
         if (language.equals("c++")) {
             return cCodeSandBox.executeCode(executeCodeRequest, problem);
         } else {
-            return new ExecuteCodeResponse(ProblemSubmitResult.DSC,null,null,null,null,"不支持该语言");
+            return
+                    new ExecuteCodeResponse(ProblemSubmitResult.DSC, "不支持该语言", null,null,null,null);
         }
     }
 }

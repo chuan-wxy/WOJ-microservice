@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.chuan.wojcommon.exception.StatusFailException;
 import com.chuan.wojcommon.exception.StatusSystemErrorException;
 import com.chuan.wojmodel.pojo.dto.problemSubmit.ProblemSubmitAddDTO;
+import com.chuan.wojmodel.pojo.dto.problemSubmit.ProblemSubmitAiDTO;
 import com.chuan.wojmodel.pojo.entity.ProblemSubmit;
 import com.chuan.wojmodel.pojo.entity.User;
 import com.chuan.wojmodel.pojo.vo.problemSubmit.ProblemSubmitVO;
@@ -16,6 +17,8 @@ import java.io.IOException;
 * @createDate 2024-09-12 12:39:38
 */
 public interface ProblemSubmitService extends IService<ProblemSubmit> {
-    ProblemSubmitVO doQuestionSubmit(ProblemSubmitAddDTO problemSubmitAddDTO, User user) throws StatusFailException, StatusSystemErrorException, IOException, InterruptedException;
+    ProblemSubmitVO doSubmit(ProblemSubmitAddDTO problemSubmitAddDTO, User user) throws StatusFailException, StatusSystemErrorException, IOException, InterruptedException;
+
+    void triggerAnalysis(String submitId, Long userId);
 
 }

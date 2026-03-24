@@ -1,6 +1,7 @@
 package com.chuan.wojjudgeservice.codesandbox;
 
 import com.chuan.wojcommon.exception.StatusFailException;
+import com.chuan.wojcommon.exception.StatusSystemErrorException;
 import com.chuan.wojmodel.pojo.codesandbox.ExecuteCodeResponse;
 import com.chuan.wojmodel.pojo.codesandbox.ExecuteCodeRequest;
 import com.chuan.wojmodel.pojo.entity.Problem;
@@ -20,5 +21,5 @@ public interface CodeSandbox {
      * @return
      */
     ExecuteCodeResponse executeCode(ExecuteCodeRequest executeCodeRequest, Problem problem) throws IOException, InterruptedException,
-            StatusFailException;
+            StatusFailException, StatusSystemErrorException;
 }

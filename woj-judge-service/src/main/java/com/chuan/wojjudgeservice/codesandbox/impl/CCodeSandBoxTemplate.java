@@ -5,6 +5,7 @@ import cn.hutool.dfa.FoundWord;
 import cn.hutool.dfa.WordTree;
 import com.chuan.wojcommon.constant.ProblemSubmitResult;
 import com.chuan.wojcommon.exception.StatusFailException;
+import com.chuan.wojcommon.exception.StatusSystemErrorException;
 import com.chuan.wojcommon.utils.ProcessUtils;
 import com.chuan.wojcommon.utils.SystemUtil;
 import com.chuan.wojjudgeservice.codesandbox.CodeSandbox;
@@ -14,10 +15,9 @@ import com.chuan.wojmodel.pojo.codesandbox.ExecuteCodeRequest;
 import com.chuan.wojmodel.pojo.codesandbox.ExecuteCodeResponse;
 import com.chuan.wojmodel.pojo.entity.Problem;
 import jakarta.annotation.PostConstruct;
+import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
-
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -61,20 +61,17 @@ public abstract class CCodeSandBoxTemplate extends CommonCodeSandboxTemplate imp
 
     @Override
     public ExecuteCodeResponse executeCode(ExecuteCodeRequest executeCodeRequest, Problem problem) throws IOException,
-            InterruptedException, StatusFailException {
+            StatusSystemErrorException {
 
         long needTime = problem.getTimeLimit();
-        String questionId = problem.getProblemId();
 
+        String questionId = problem.getProblemId();
         String code = executeCodeRequest.getCode();
 
-        // 黑名单校验
-        WordTree wordTree = new WordTree();
-        wordTree.addWords(blackList);
         FoundWord foundWord = WORD_TREE.matchWord(code);
         if (foundWord != null) {
             System.out.println("包含禁止词：" + foundWord.getFoundWord());
-            return new ExecuteCodeResponse(ProblemSubmitResult.DSC,null, null,null,null,"包含禁止词：" + foundWord.getFoundWord());
+            return new ExecuteCodeResponse(ProblemSubmitResult.DSC, "包含禁止词：" + foundWord.getFoundWord(),null, null,null,null);
         }
 
         // 写文件
@@ -85,20 +82,20 @@ public abstract class CCodeSandBoxTemplate extends CommonCodeSandboxTemplate imp
 
         // 编译文件
         ExecuteMessage executeMessage = compileFile(parentPath, path);
-        System.out.println("编译结果: " + executeMessage);
-        if (executeMessage.getErrorMessage() != null) {
+
+        if (executeMessage.getExitValue() !=0 ) {
             // 返回编译错误信息
-            return new ExecuteCodeResponse(ProblemSubmitResult.CE,null, null,null,null,executeMessage.getErrorMessage());
+            return new ExecuteCodeResponse(ProblemSubmitResult.CE, executeMessage.getInfo(), null,null, null, null);
         }
 
         // 执行代码
         ExecuteCodeResponse executeCodeResponse = runFile(parentPath, questionId, needTime);
 
         // 文件清理
-        boolean b = deleteFile(userCodeFile);
-        if (!b) {
-            log.error("deleteFile error, userCodeFilePath = {}", userCodeFile.getAbsolutePath());
-        }
+//        boolean b = deleteFile(userCodeFile);
+//        if (!b) {
+//            log.error("deleteFile error, userCodeFilePath = {}", userCodeFile.getAbsolutePath());
+//        }
 
         return executeCodeResponse;
     }
@@ -108,8 +105,10 @@ public abstract class CCodeSandBoxTemplate extends CommonCodeSandboxTemplate imp
      * @param
      * @return
      */
-    public ExecuteMessage compileFile(String parentPath, String path)
-    {
+    public ExecuteMessage compileFile(String parentPath, String path) {
+        File file = new File(path);
+        String fileName = file.getName();  // 只获取文件名 Main.cpp
+
         String shell = SystemUtil.getShell();
 
         try {
@@ -119,29 +118,28 @@ public abstract class CCodeSandBoxTemplate extends CommonCodeSandboxTemplate imp
             cmd.add("g++");
             cmd.add("-std=c++17");
             cmd.add("-o");
-            cmd.add(parentPath+File.separator+"Main.exe");
-            cmd.add(path);
+            cmd.add("Main.exe");
+            cmd.add(fileName);
 
             ProcessBuilder pb = new ProcessBuilder(cmd);
+            pb.directory(new File(parentPath));
 
             // 合并 错误流和标准流
-            // pb.redirectErrorStream(true);
+            pb.redirectErrorStream(true);
             Process compileProcess = pb.start();
             ExecuteMessage executeMessage = ProcessUtils.runProcessAndGetMessage(compileProcess, "编译");
+
             // 编译失败
             if(executeMessage.getExitValue() != 0){
-                String realErrorDetail = executeMessage.getErrorMessage();
                 executeMessage.setExitValue(1);
-                executeMessage.setMessage(ProblemSubmitResult.CE);
-                executeMessage.setErrorMessage("编译错误详情:\n" + realErrorDetail);
+                executeMessage.setResult(ProblemSubmitResult.CE);
             }
             return executeMessage;
         } catch (Exception e) {
             // 未知错误
             ExecuteMessage executeMessage = new ExecuteMessage();
             executeMessage.setExitValue(1);
-            executeMessage.setMessage(e.getMessage());
-            executeMessage.setErrorMessage("系统错误");
+            executeMessage.setInfo(e.getMessage());
             return executeMessage;
         }
     }
@@ -153,15 +151,40 @@ public abstract class CCodeSandBoxTemplate extends CommonCodeSandboxTemplate imp
      * @return
      */
     // todo 实现linux系统下的计时
-    public ExecuteCodeResponse runFile(String parentPath,String questionId,long needTime) throws IOException {
+    public ExecuteCodeResponse runFile(String parentPath,String questionId,long needTime) throws IOException, StatusSystemErrorException {
         ExecuteCodeResponse executeCodeResponse = new ExecuteCodeResponse();
         List<Long> timeList = new ArrayList<>();
 
-        for (int i = 0; i < 10 ; i++) {
-            String inputPath = STATIC_JUDGE_CASE_PATH + File.separator + questionId + File.separator + "test" + i + ".in";
-            String outputPath = parentPath + File.separator + "test" + i + ".out";
-            String answerPath = STATIC_JUDGE_CASE_PATH + File.separator + questionId + File.separator + "test" + i + ".out";
+        // 获取测试用例所在的文件夹
+        File judgeCaseDir = new File(STATIC_JUDGE_CASE_PATH + File.separator + questionId);
+        if (!judgeCaseDir.exists() || !judgeCaseDir.isDirectory()) {
+            throw new StatusSystemErrorException("测试用例不存在");
+        }
 
+        // 获取所有以 .in 结尾的文件，并按数字顺序排序
+        File[] inputFiles = judgeCaseDir.listFiles((dir, name) -> name.startsWith("test") && name.endsWith(".in"));
+        if (inputFiles == null || inputFiles.length == 0) {
+            throw new StatusSystemErrorException("测试用例不存在");
+        }
+
+        // 排序逻辑：确保 test0.in, test1.in ... test10.in 顺序正确
+        Arrays.sort(inputFiles, (f1, f2) -> {
+            int n1 = extractNumber(f1.getName());
+            int n2 = extractNumber(f2.getName());
+            return Integer.compare(n1, n2);
+        });
+
+        for (File inputFile : inputFiles) {
+            String inputFileName = inputFile.getName();
+            String baseName = inputFileName.substring(0, inputFileName.lastIndexOf(".in"));
+
+            String inputPath = inputFile.getAbsolutePath();
+            String outputPath = parentPath + File.separator + baseName + ".out";
+            String answerPath = judgeCaseDir.getAbsolutePath() + File.separator + baseName + ".out";
+
+            if (!new File(answerPath).exists()) {
+                throw new StatusSystemErrorException(Integer.valueOf("缺失对应的答案文件: {}"), answerPath);
+            }
 
             ProcessBuilder builder = new ProcessBuilder(parentPath + File.separator + "Main.exe");
 
@@ -203,7 +226,7 @@ public abstract class CCodeSandBoxTemplate extends CommonCodeSandboxTemplate imp
 
                 timeList.add(duration);
                 //debugger
-                System.out.println("样例" + i + "用时：" + duration);
+                System.out.println("样例用时：" + duration);
 
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
@@ -213,8 +236,20 @@ public abstract class CCodeSandBoxTemplate extends CommonCodeSandboxTemplate imp
                 }
             }
         }
+
         executeCodeResponse.setResult(ProblemSubmitResult.AC);
         return executeCodeResponse;
+    }
+
+    /**
+     * 从文件名中提取数字进行正确排序
+     */
+    private int extractNumber(String name) {
+        try {
+            return Integer.parseInt(name.replaceAll("[^0-9]", ""));
+        } catch (Exception e) {
+            return 0;
+        }
     }
 
     private boolean compareAnswer(String answerPath, String outputPath) {

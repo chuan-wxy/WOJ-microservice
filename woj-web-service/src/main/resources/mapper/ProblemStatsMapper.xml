@@ -27,4 +27,17 @@
     <select id="getByPid" resultType="com.chuan.wojmodel.pojo.entity.ProblemStats">
         SELECT * FROM problem_stats WHERE pid = #{pid}
     </select>
+
+    <update id="incrementStats">
+        UPDATE problem_stats
+        SET total_submissions = total_submissions + 1,
+            ac_count  = ac_count  + (CASE WHEN #{result} = 'Accepted'  THEN 1 ELSE 0 END),
+            wa_count  = wa_count  + (CASE WHEN #{result} = 'Wrong Answer'  THEN 1 ELSE 0 END),
+            tle_count = tle_count + (CASE WHEN #{result} = 'Time Limit Exceeded' THEN 1 ELSE 0 END),
+            mle_count = mle_count + (CASE WHEN #{result} = 'Memory Limit Exceeded' THEN 1 ELSE 0 END),
+            re_count  = re_count  + (CASE WHEN #{result} = 'Runtime Error'  THEN 1 ELSE 0 END),
+            ce_count  = ce_count  + (CASE WHEN #{result} = 'Compilation Error'  THEN 1 ELSE 0 END),
+            se_count  = se_count  + (CASE WHEN #{result} = 'Segmentation Fault'  THEN 1 ELSE 0 END)
+        WHERE pid = #{pid}
+    </update>
 </mapper>

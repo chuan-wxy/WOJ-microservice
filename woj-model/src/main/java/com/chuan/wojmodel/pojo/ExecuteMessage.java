@@ -6,9 +6,9 @@ import lombok.Data;
 public class ExecuteMessage {
     private Integer exitValue;
 
-    private String message;
+    private String result;
 
-    private String errorMessage;
+    private String info;
 
     private Long time;
 

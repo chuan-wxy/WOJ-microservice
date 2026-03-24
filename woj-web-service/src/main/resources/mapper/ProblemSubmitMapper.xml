@@ -11,18 +11,19 @@
         <result property="language" column="language" jdbcType="VARCHAR"/>
         <result property="code" column="code" jdbcType="VARCHAR"/>
         <result property="judgeResult" column="judge_result" jdbcType="VARCHAR"/>
+        <result property="judgeInfo" column="judge_info" jdbcType="VARCHAR"/>
         <result property="state" column="state" jdbcType="INTEGER"/>
         <result property="timeList" column="time_list" jdbcType="VARCHAR"/>
         <result property="memoryList" column="memory_list" jdbcType="VARCHAR"/>
         <result property="stackList" column="stack_list" jdbcType="VARCHAR"/>
-        <result property="createTime" column="createime" jdbcType="TIMESTAMP"/>
-        <result property="updateTime" column="updateTime" jdbcType="TIMESTAMP"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
     </resultMap>
 
     <sql id="Base_Column_List">
         id,pid,uid,
-        language,code,judgeResult,
-        timeList,memoryList,stackList,
-        createTime,updateTime
+        language,code,judge_result,judge_info,
+        time_list,memory_list,stack_list,
+        create_time,update_time
     </sql>
 </mapper>

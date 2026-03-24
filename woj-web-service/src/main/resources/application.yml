@@ -29,3 +29,8 @@ emailUtil:
   password: unijbjmgvfspdddb
   name: AcKing
 
+ai:
+  typewriter:
+    chunk-size: ${AI_TYPEWRITER_CHUNK_SIZE:2}
+    delay-ms: ${AI_TYPEWRITER_DELAY_MS:35}
+

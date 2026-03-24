@@ -7,6 +7,7 @@ import com.chuan.wojmodel.pojo.dto.announcement.AnnouncementSearchDTO;
 import com.chuan.wojmodel.pojo.entity.Announcement;
 import com.chuan.wojmodel.pojo.vo.announcement.AnnouncementContentVO;
 import com.chuan.wojmodel.pojo.vo.announcement.AnnouncementTitleVO;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;

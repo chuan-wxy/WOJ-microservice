@@ -36,7 +36,7 @@ mybatis-plus:
       logic-not-delete-value: 0
   configuration:
     # 打印 SQL 到控制台
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    # log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
     map-underscore-to-camel-case: true
 
 # springdoc-openapi项目配置

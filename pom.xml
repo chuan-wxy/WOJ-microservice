@@ -25,7 +25,8 @@
 		<module>woj-web-service</module>
 		<module>woj-judge-service</module>
 		<module>woj-service-client</module>
-	</modules>
+        <module>woj-ai-service</module>
+    </modules>
 	<scm>
 		<connection/>
 		<developerConnection/>

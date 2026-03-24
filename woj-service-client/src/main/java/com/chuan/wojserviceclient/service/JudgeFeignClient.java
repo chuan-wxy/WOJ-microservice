@@ -2,6 +2,7 @@ package com.chuan.wojserviceclient.service;
 
 
 import com.chuan.wojcommon.exception.StatusFailException;
+import com.chuan.wojcommon.exception.StatusSystemErrorException;
 import com.chuan.wojmodel.pojo.codesandbox.ExecuteCodeResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,5 +19,5 @@ import java.io.IOException;
 public interface JudgeFeignClient {
     @PostMapping("/dojudge")
     ExecuteCodeResponse doJudge(@RequestParam("problemSubmitId") long problemSubmitId) throws StatusFailException, IOException,
-            InterruptedException;
+            InterruptedException, StatusSystemErrorException;
 }

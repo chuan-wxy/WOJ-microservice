@@ -5,6 +5,7 @@ import com.chuan.wojcommon.exception.StatusFailException;
 import com.chuan.wojcommon.exception.StatusSystemErrorException;
 import com.chuan.wojcommon.utils.ResultUtils;
 import com.chuan.wojmodel.pojo.dto.problemSubmit.ProblemSubmitAddDTO;
+import com.chuan.wojmodel.pojo.dto.problemSubmit.ProblemSubmitAiDTO;
 import com.chuan.wojmodel.pojo.entity.User;
 import com.chuan.wojmodel.pojo.vo.problemSubmit.ProblemSubmitVO;
 import com.chuan.wojserviceclient.service.UserFeignClient;
@@ -12,6 +13,7 @@ import com.chuan.wojwebservice.service.ProblemSubmitService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -44,8 +46,17 @@ public class ProblemSubmitController {
                                                   HttpServletRequest request) throws StatusFailException, StatusSystemErrorException, IOException, InterruptedException {
         User user = userFeignClient.getLoginUser(request).getData();
 
-        ProblemSubmitVO problemSubmitVO = problemSubmitService.doQuestionSubmit(problemSubmitAddDTO, user);
+        ProblemSubmitVO problemSubmitVO = problemSubmitService.doSubmit(problemSubmitAddDTO, user);
 
         return ResultUtils.success(problemSubmitVO);
     }
+
+    @PostMapping("/trigger-analysis")
+    public BaseResponse<String> triggerAnalysis(@NotBlank @RequestBody String submitId,
+                                                HttpServletRequest request) throws StatusFailException {
+        User user = userFeignClient.getLoginUser(request).getData();
+        problemSubmitService.triggerAnalysis(submitId, user.getId());
+        return ResultUtils.success("AI analysis started");
+    }
+
 }

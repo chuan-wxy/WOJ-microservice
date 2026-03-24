@@ -1,6 +1,7 @@
 package com.chuan.wojjudgeservice.service;
 
 import com.chuan.wojcommon.exception.StatusFailException;
+import com.chuan.wojcommon.exception.StatusSystemErrorException;
 import com.chuan.wojmodel.pojo.codesandbox.ExecuteCodeResponse;
 import org.springframework.stereotype.Service;
 
@@ -12,5 +13,5 @@ import java.io.IOException;
  * @Description:
  */
 public interface JudgeService {
-    ExecuteCodeResponse doJudge(long problemSubmitId) throws StatusFailException, IOException, InterruptedException;
+    ExecuteCodeResponse doJudge(long problemSubmitId) throws StatusFailException, IOException, InterruptedException, StatusSystemErrorException;
 }

@@ -16,7 +16,9 @@ public class ProblemSubmitVO  implements Serializable {
 
     private Long id;
 
-    private String result;
+    private String judgeResult;
+
+    private String judgeInfo;
 
     private List<Long> timeLit;
 

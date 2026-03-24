@@ -93,47 +93,6 @@ public class ProblemController {
         return problemService.getProblemStatistics(id);
     }
 
-//    /**
-//     * 用于全局搜索框
-//     *
-//     * @param current
-//     * @param size
-//     * @param text
-//     * @return
-//     * @throws StatusFailException
-//     */
-//    @GetMapping("/search-problemtitle")
-//    public BaseResponse<Page<ProblemTitleVO>> searchProblemTitleOne(
-//                                                              @RequestParam(value = "current") Integer current,
-//                                                              @RequestParam(value = "size") Integer size,
-//                                                              @RequestParam(value = "text") String text) throws StatusFailException {
-//        return problemService.searchProblemTitle(current, size,text);
-//    }
-
-//    /**
-//     * 用于列表页面
-//     *
-//     * @param current
-//     * @param size
-//     * @param id
-//     * @param tags
-//     * @param difficulty
-//     * @param title
-//     * @return
-//     * @throws StatusFailException
-//     */
-//    @GetMapping("/search-problemtitlelist")
-//    public BaseResponse<IPage<ProblemTitleVO>> searchProblemTitleTwo(
-//            @RequestParam(value = "current") Integer current,
-//            @RequestParam(value = "size") Integer size,
-//            @RequestParam(value = "id",required = false) Long id,
-//            @RequestParam(value = "tags",required = false) String tags,
-//            @RequestParam(value = "difficulty",required = false) String difficulty,
-//            @RequestParam(value = "title",required = false) String title) throws StatusFailException {
-//
-//        return problemService.searchProblemTitleTwo(current, size,id,tags,difficulty,title);
-//    }
-
     @PostMapping("/problemtitle-list")
     public BaseResponse<Page<ProblemTitleVO>> getProblemTitleList(@RequestBody ProblemSearchDTO problemSearchDTO,
                                                                   @RequestParam("current") Integer current,
@@ -141,11 +100,6 @@ public class ProblemController {
         return problemService.getProblemTitleList(problemSearchDTO, current, size);
     }
 
-    /**
-     * 获取所有题目标签
-     *
-     * @return
-     */
     @GetMapping("/get-problemtaglist")
     public BaseResponse<List<TagVO>> getProblemTagList() {
         return tagService.getProblemTagList();

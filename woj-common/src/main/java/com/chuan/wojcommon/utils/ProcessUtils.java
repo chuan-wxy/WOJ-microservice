@@ -34,6 +34,7 @@ public class ProcessUtils {
             // 等待程序执行，获取错误码
             int exitValue = runProcess.waitFor();
             executeMessage.setExitValue(exitValue);
+
             // 正常退出
             if (exitValue == 0) {
                 System.out.println(opName + "成功");
@@ -43,9 +44,9 @@ public class ProcessUtils {
                 // 逐行读取
                 String compileOutputLine;
                 while ((compileOutputLine = bufferedReader.readLine()) != null) {
-                    compileOutputStringBuilder.append(compileOutputLine);
+                    compileOutputStringBuilder.append(compileOutputLine).append("\n");
                 }
-                executeMessage.setMessage(compileOutputStringBuilder.toString());
+                executeMessage.setInfo(compileOutputStringBuilder.toString());
             } else {
                 // 异常退出
                 System.out.println(opName + "失败，错误码： " + exitValue);
@@ -55,20 +56,9 @@ public class ProcessUtils {
                 // 逐行读取
                 String compileOutputLine;
                 while ((compileOutputLine = bufferedReader.readLine()) != null) {
-                    compileOutputStringBuilder.append(compileOutputLine);
+                    compileOutputStringBuilder.append(compileOutputLine).append("\n");
                 }
-                executeMessage.setMessage(compileOutputStringBuilder.toString());
-
-                // 分批获取进程的错误输出
-                BufferedReader errorBufferedReader = new BufferedReader(new InputStreamReader(runProcess.getErrorStream(), charset));
-                StringBuilder errorCompileOutputStringBuilder = new StringBuilder();
-
-                // 逐行读取
-                String errorCompileOutputLine;
-                while ((errorCompileOutputLine = errorBufferedReader.readLine()) != null) {
-                    errorCompileOutputStringBuilder.append(errorCompileOutputLine);
-                }
-                executeMessage.setErrorMessage(errorCompileOutputStringBuilder.toString());
+                executeMessage.setInfo(compileOutputStringBuilder.toString());
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -120,10 +110,11 @@ public class ProcessUtils {
 
             stopWatch.stop();
 
-            executeMessage.setMessage(compileOutputStringBuilder.toString());
+            executeMessage.setInfo(compileOutputStringBuilder.toString());
             //debug
             System.out.println("单挑用例用时");
             System.out.println(stopWatch.getLastTaskTimeMillis());
+
             executeMessage.setTime(stopWatch.getLastTaskTimeMillis());
             // 记得资源的释放，否则会卡死
             outputStreamWriter.close();

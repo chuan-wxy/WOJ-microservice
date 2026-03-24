@@ -43,14 +43,14 @@ spring:
           max-wait: 2000 #连接池最大阻塞等待时间（使用负值表示没有限制）
 
 server:
-  port: 8088
+  port: 8103
   ssl:
     key-store-type: ${ssl-key-store-type}
     key-password: ${ssl-key-password}
     key-store: ${ssl-key-store-path}
 
   servlet:
-    context-path: /api
+    context-path: /api/web
 
 mybatis-plus:
   global-config:

@@ -1,0 +1,38 @@
+spring:
+  profiles:
+    active: dev
+  application:
+    name: woj-ai-service
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+server:
+  servlet:
+    context-path: /api/ai
+    session:
+      cookie:
+        max-age: 2592000
+        path: "/api"
+
+logging:
+  pattern:
+    dateformat: yyyy-MM-dd HH:mm:ss:SSS
+
+knife4j:
+  enable: true
+
+emailUtil:
+  hostName: smtp.qq.com
+  charset: UTF-8
+  account: 3153917921@qq.com
+  password: unijbjmgvfspdddb
+  name: AcKing
+
+ai:
+  autodl-api-url: ${AI_AUTODL_API_URL:https://u435925-26qz-23b45b97.westd.seetacloud.com:8443/}
+  connect-timeout-ms: ${AI_CONNECT_TIMEOUT_MS:3000}
+  read-timeout-ms: ${AI_READ_TIMEOUT_MS:15000}
+  max-code-length: ${AI_MAX_CODE_LENGTH:8000}
+
+

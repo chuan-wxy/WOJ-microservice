@@ -15,6 +15,8 @@ public class ExecuteCodeResponse {
 
     private String result;
 
+    private String info;
+
     private List<String> outputList;
 
     private List<Long> timeList;
@@ -22,7 +24,4 @@ public class ExecuteCodeResponse {
     private List<Long> memoryList;
 
     private List<Long> stackList;
-
-    private String errorMessage;
-
 }

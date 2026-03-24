@@ -11,6 +11,7 @@ import java.util.List;
  * @Date: 2024/9/12 13:17
  * @Description:
  */
+//todo delete
 @Data
 public class JudgeInfo {
 

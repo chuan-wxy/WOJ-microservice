@@ -21,8 +21,7 @@ public class CommonCodeSandboxTemplate
     public File saveCodeToFile(String code, String parentPath, String fileName)
     {
         // 判断全局代码目录是否存在，没有则新建
-        if (!FileUtil.exist(parentPath))
-        {
+        if (!FileUtil.exist(parentPath)) {
             FileUtil.mkdir(parentPath);
         }
 

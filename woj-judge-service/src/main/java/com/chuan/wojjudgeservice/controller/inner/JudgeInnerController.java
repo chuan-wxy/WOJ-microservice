@@ -1,6 +1,7 @@
 package com.chuan.wojjudgeservice.controller.inner;
 
 import com.chuan.wojcommon.exception.StatusFailException;
+import com.chuan.wojcommon.exception.StatusSystemErrorException;
 import com.chuan.wojjudgeservice.service.JudgeService;
 import com.chuan.wojmodel.pojo.codesandbox.ExecuteCodeResponse;
 import com.chuan.wojserviceclient.service.JudgeFeignClient;
@@ -21,8 +22,7 @@ public class JudgeInnerController implements JudgeFeignClient {
 
     @Override
     @PostMapping("/dojudge")
-    public ExecuteCodeResponse doJudge(@RequestParam("problemSubmitId") long problemSubmitId) throws StatusFailException, IOException, InterruptedException {
-        ExecuteCodeResponse executeCodeResponse = judgeService.doJudge(problemSubmitId);
-        return executeCodeResponse;
+    public ExecuteCodeResponse doJudge(@RequestParam("problemSubmitId") long problemSubmitId) throws StatusFailException, IOException, InterruptedException, StatusSystemErrorException {
+        return judgeService.doJudge(problemSubmitId);
     }
 }
