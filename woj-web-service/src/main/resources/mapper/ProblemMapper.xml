@@ -40,5 +40,8 @@
             #{id}
         </foreach>
     </select>
+    <select id="getProblemIdList" resultType="java.lang.Long">
+        SELECT id FROM problem
+    </select>
 
 </mapper>

@@ -16,6 +16,7 @@ import java.io.Serializable;
 public class ProblemTagDTO {
     private Long pid;
 
+    private String problemId;
 
     private String problemName;
 

@@ -15,4 +15,6 @@ import java.util.List;
 public interface ProblemMapper extends BaseMapper<Problem> {
 
     List<ProblemTagDTO> selectProblemTagsByPids(@Param("pids")List<Long> pids);
+
+    List<Long> getProblemIdList();
 }

@@ -241,6 +241,16 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem>
         return ResultUtils.success(problemTitleVOPage);
     }
 
+    @Override
+    public BaseResponse<List<String>> getProblemTagsByPid(Long pid) throws StatusFailException {
+        if (pid == null || pid <= 0) {
+            throw new StatusFailException("pid不能为空且必须为正数");
+        }
+
+        Map<Long, List<String>> tagsMap = this.batchGetProblemTags(List.of(pid));
+        return ResultUtils.success(tagsMap.getOrDefault(pid, new ArrayList<>()));
+    }
+
     public Map<Long, List<String>> batchGetProblemTags(List<Long> pids) {
         if (CollUtil.isEmpty(pids)) {
             return new HashMap<>();

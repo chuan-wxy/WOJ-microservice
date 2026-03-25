@@ -8,12 +8,15 @@ import com.chuan.wojcommon.exception.StatusFailException;
 import com.chuan.wojcommon.exception.StatusSystemErrorException;
 import com.chuan.wojmodel.pojo.dto.problem.ProblemAddDTO;
 import com.chuan.wojmodel.pojo.dto.problem.ProblemSearchDTO;
+import com.chuan.wojmodel.pojo.dto.problem.ProblemTagDTO;
 import com.chuan.wojmodel.pojo.dto.problem.ProblemUpdateDTO;
 import com.chuan.wojmodel.pojo.entity.Problem;
 import com.chuan.wojmodel.pojo.entity.ProblemStats;
 import com.chuan.wojmodel.pojo.vo.problem.ProblemTitleVO;
 import com.chuan.wojmodel.pojo.vo.problem.ProblemVO;
 import com.chuan.wojmodel.pojo.vo.problemStats.ProblemStatsVO;
+
+import java.util.List;
 
 /**
 * @author chuan-wxy
@@ -33,4 +36,9 @@ public interface ProblemService extends IService<Problem> {
     BaseResponse<String> updateProblem(ProblemUpdateDTO problemUpdateDTO) throws StatusFailException;
 
     BaseResponse<Page<ProblemTitleVO>> getProblemTitleList(ProblemSearchDTO problemSearchDTO, Integer current, Integer size);
+
+    /**
+     * 查询题目的标签（tag）列表，用于 AI function/tool 调用。
+     */
+    BaseResponse<List<String>> getProblemTagsByPid(Long pid) throws StatusFailException;
 }

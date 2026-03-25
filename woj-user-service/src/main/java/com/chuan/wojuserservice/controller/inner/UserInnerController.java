@@ -3,12 +3,16 @@ package com.chuan.wojuserservice.controller.inner;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.chuan.wojmodel.pojo.entity.User;
 import com.chuan.wojserviceclient.service.UserFeignClient;
+import com.chuan.wojuserservice.mapper.UserMapper;
 import com.chuan.wojuserservice.service.UserService;
 import jakarta.annotation.Resource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/inner")
@@ -16,6 +20,8 @@ public class UserInnerController implements UserFeignClient {
 
     @Resource
     private UserService userService;
+    @Autowired
+    private UserMapper userMapper;
 
     @Override
     @GetMapping("/test")

@@ -17,6 +17,11 @@ import java.util.Date;
  */
 @Data
 public class ProblemSubmitAiDTO implements Serializable {
+    /**
+     * 题目表 `problem` 的主键 pid，用于让 AI 在 function/tool 调用时查询本地题目标签。
+     */
+    private Long pid;
+
     @NotBlank(message = "代码语言不能为空")
     private String language;
 
@@ -33,6 +38,8 @@ public class ProblemSubmitAiDTO implements Serializable {
 
     @NotBlank(message = "题目描述不能为空")
     private String description;
+
+    private String question;
 
     @Serial
     private static final long serialVersionUID = 1L;

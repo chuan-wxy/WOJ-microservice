@@ -155,6 +155,7 @@ public class ProblemSubmitServiceImpl extends ServiceImpl<ProblemSubmitMapper, P
 
         Problem problem = problemMapper.selectById(problemSubmit.getPid());
 
+        problemSubmitAiDTO.setPid(problemSubmit.getPid());
         problemSubmitAiDTO.setLanguage(problemSubmit.getLanguage());
         problemSubmitAiDTO.setCode(problemSubmit.getCode());
         problemSubmitAiDTO.setJudgeResult(problemSubmit.getJudgeResult());

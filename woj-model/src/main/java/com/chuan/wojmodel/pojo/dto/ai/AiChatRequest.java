@@ -20,6 +20,7 @@ public class AiChatRequest {
     private String model = "qwen-oj";
     private List<Message> messages;
     private double temperature = 0.2;
+    private Boolean stream;
 
     @Data
     @AllArgsConstructor

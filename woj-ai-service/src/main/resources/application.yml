@@ -30,7 +30,7 @@ emailUtil:
   name: AcKing
 
 ai:
-  autodl-api-url: ${AI_AUTODL_API_URL:https://u435925-26qz-23b45b97.westd.seetacloud.com:8443/}
+  autodl-api-url: ${AI_AUTODL_API_URL:https://u435925-26qz-23b45b97.westd.seetacloud.com:8443/v1/chat/completions}
   connect-timeout-ms: ${AI_CONNECT_TIMEOUT_MS:3000}
   read-timeout-ms: ${AI_READ_TIMEOUT_MS:15000}
   max-code-length: ${AI_MAX_CODE_LENGTH:8000}

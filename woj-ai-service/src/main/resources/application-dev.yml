@@ -53,3 +53,10 @@ knife4j:
 logging:
   level:
     org.springframework.jdbc.support.JdbcTransactionManager: debug
+
+langchain4j:
+  community:
+    dashscope:
+      chat-model:
+        model-name: qwen-max
+        api-key: sk-83f50d6b04a4415fb2dc79d46f3deb3a

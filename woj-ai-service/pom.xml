@@ -10,7 +10,6 @@
     </parent>
 
     <artifactId>woj-ai-service</artifactId>
-    <version>${revision}</version>
     <name>woj-ai-service</name>
     <description>woj-web-service</description>
 
@@ -34,24 +33,24 @@
             <artifactId>woj-service-client</artifactId>
             <version>${revision}</version>
         </dependency>
-        <!--knife4j-->
+
+        <!-- knife4j -->
         <dependency>
             <groupId>com.github.xiaoymin</groupId>
             <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
             <version>4.4.0</version>
         </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>
         </dependency>
 
     </dependencies>
-
-
-
 </project>

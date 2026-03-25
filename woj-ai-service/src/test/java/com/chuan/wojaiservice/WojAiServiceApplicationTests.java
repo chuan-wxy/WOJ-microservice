@@ -1,6 +1,8 @@
 package com.chuan.wojaiservice;
 
+import com.chuan.wojaiservice.service.AiService;
 import com.chuan.wojmodel.pojo.dto.ai.AiChatRequest;
+import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +18,6 @@ import java.util.Map;
 @SpringBootTest
 class WojAiServiceApplicationTests {
     private final String AUTODL_API_URL = "https://u435925-26qz-23b45b97.westd.seetacloud.com:8443/v1/chat/completions";
-
 
     @Test
     void contextLoads() {
