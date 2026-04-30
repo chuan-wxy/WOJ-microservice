@@ -39,12 +39,13 @@ public class EmailServiceImpl implements EmailService {
         // todo 根据网站配置，判断是否开启注册
         boolean isEmail = Validator.isEmail(email);
         if (!isEmail) {
-            return new BaseResponse(400, "您的邮箱格式不正确！");
+            return ResultUtils.error("您的邮箱格式不正确！");
+
         }
 
         String lockKey = EmailEnum.REGISTER_EMAIL_LOCK + email;
         if(redisUtils.hasKey(lockKey)) {
-            return new BaseResponse(400,"对不起，您的操作频率过快，请在" + redisUtils.getExpire(lockKey) + "秒后再次发送注册邮件！");
+            return ResultUtils.error("对不起，您的操作频率过快，请在" + redisUtils.getExpire(lockKey) + "秒后再次发送注册邮件！");
         }
 
         LambdaQueryWrapper<User> lambdaQueryWrapper = new LambdaQueryWrapper<>();
@@ -62,10 +63,10 @@ public class EmailServiceImpl implements EmailService {
         log.info(email+"正在发送验证码");
         if(EmailUtil.send(email,numbers,content)) {
             log.info(email+"验证码发送成功");
-            return new BaseResponse(ResultStatus.OK);
+            return ResultUtils.success("发送成功");
         } else {
             log.info(email + "验证码发送失败");
-            return new BaseResponse(400,"验证码发送失败");
+            return ResultUtils.error("验证码发送失败");
         }
     }
 }
