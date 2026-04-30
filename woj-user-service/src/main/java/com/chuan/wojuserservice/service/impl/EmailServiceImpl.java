@@ -2,6 +2,7 @@ package com.chuan.wojuserservice.service.impl;
 
 import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.RandomUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.chuan.wojcommon.common.BaseResponse;
 import com.chuan.wojcommon.common.ResultStatus;
@@ -46,12 +47,11 @@ public class EmailServiceImpl implements EmailService {
             return new BaseResponse(400,"对不起，您的操作频率过快，请在" + redisUtils.getExpire(lockKey) + "秒后再次发送注册邮件！");
         }
 
-        QueryWrapper<User> queryWrapper = new QueryWrapper<User>();
-        queryWrapper.eq("userAccount",email);
+        LambdaQueryWrapper<User> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(User::getAccount, email);
 
-        User user = userService.getOne(queryWrapper);
+        User user = userService.getOne(lambdaQueryWrapper);
         if (user != null) {
-            System.out.println(1);
             return ResultUtils.error("改邮箱已被注册");
         }
 
