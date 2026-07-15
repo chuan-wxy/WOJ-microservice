@@ -1,15 +1,14 @@
 package com.chuan.wojjudgeservice.service.impl;
 
-import com.chuan.wojcommon.common.enums.UserRoleEnum;
-import com.chuan.wojcommon.constant.ProblemSubmitResult;
 import com.chuan.wojcommon.exception.StatusFailException;
 import com.chuan.wojcommon.exception.StatusSystemErrorException;
-import com.chuan.wojjudgeservice.codesandbox.impl.CCodeSandBox;
+import com.chuan.wojjudgeservice.codesandbox.CodeSandbox;
+import com.chuan.wojjudgeservice.codesandbox.CodeSandboxFactory;
 import com.chuan.wojjudgeservice.service.JudgeService;
 import com.chuan.wojmodel.pojo.codesandbox.ExecuteCodeRequest;
 import com.chuan.wojmodel.pojo.codesandbox.ExecuteCodeResponse;
+import com.chuan.wojmodel.pojo.dto.judge.JudgeContextDTO;
 import com.chuan.wojmodel.pojo.entity.Problem;
-import com.chuan.wojmodel.pojo.entity.ProblemSubmit;
 import com.chuan.wojserviceclient.service.WebFeignClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,40 +16,47 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 
 /**
- * @Author: chuan-wxy
- * @Date: 2024/9/12 13:57
- * @Description:
+ * Judge service implementation.
  */
 @Service
 public class JudgeServiceImpl implements JudgeService {
 
     @Autowired
-    WebFeignClient webFeignClient;
+    private WebFeignClient webFeignClient;
 
     @Autowired
-    private CCodeSandBox cCodeSandBox;
+    private CodeSandboxFactory codeSandboxFactory;
 
     @Override
     public ExecuteCodeResponse doJudge(long problemSubmitId) throws StatusFailException, IOException, InterruptedException, StatusSystemErrorException {
-        ProblemSubmit problemSubmit = webFeignClient.getProblemSubmitById(problemSubmitId);
-        if(problemSubmit == null) throw new StatusFailException("提交信息不存在");
+        JudgeContextDTO judgeContextDTO = webFeignClient.getJudgeContext(problemSubmitId);
+        if (judgeContextDTO == null) {
+            throw new StatusFailException("判题上下文不存在");
+        }
 
-        Long pid = problemSubmit.getPid();
-        Problem problem = webFeignClient.getProblemById(pid);
-        
-        String language = problemSubmit.getLanguage();
-        String code = problemSubmit.getCode();
-
+        String language = judgeContextDTO.getLanguage();
         ExecuteCodeRequest executeCodeRequest = ExecuteCodeRequest.builder()
-                .code(code)
+                .code(judgeContextDTO.getCode())
                 .language(language)
                 .build();
 
-        if (language.equals("c++")) {
-            return cCodeSandBox.executeCode(executeCodeRequest, problem);
-        } else {
-            return
-                    new ExecuteCodeResponse(ProblemSubmitResult.DSC, "不支持该语言", null,null,null,null);
-        }
+        CodeSandbox codeSandbox = codeSandboxFactory.getSandbox(language);
+        return codeSandbox.executeCode(executeCodeRequest, buildProblem(judgeContextDTO));
+    }
+
+    private Problem buildProblem(JudgeContextDTO judgeContextDTO) {
+        Problem problem = new Problem();
+        problem.setId(judgeContextDTO.getProblemId());
+        problem.setProblemId(judgeContextDTO.getProblemCode());
+        problem.setTimeLimit(judgeContextDTO.getTimeLimit());
+        problem.setMemoryLimit(judgeContextDTO.getMemoryLimit());
+        problem.setStackLimit(judgeContextDTO.getStackLimit());
+        problem.setJudgeMode(judgeContextDTO.getJudgeMode());
+        problem.setSpjCode(judgeContextDTO.getSpjCode());
+        problem.setSpjLanguage(judgeContextDTO.getSpjLanguage());
+        problem.setIsFileIo(judgeContextDTO.getIsFileIo());
+        problem.setIoReadFileName(judgeContextDTO.getIoReadFileName());
+        problem.setIoWriteFileName(judgeContextDTO.getIoWriteFileName());
+        return problem;
     }
 }
