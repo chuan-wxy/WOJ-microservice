@@ -4,55 +4,54 @@ import org.apache.commons.lang3.ObjectUtils;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * 编程语言枚举类
- *
- * @Author: chuan-wxy
- * @Date: 2024/9/12 14:00
- * @Description:
+ * Problem submit language enum.
  */
 public enum ProblemSubmitLanguageEnum {
 
-    JAVA("java", "java"),
-    CPLUSPLUS("c++", "c++"),
-    GOLANG("golang", "golang");
+    JAVA("Java", "java", Set.of("java", "java17")),
+    CPP("C++", "c++", Set.of("c++", "cpp", "cpp17"));
 
     private final String text;
 
     private final String value;
 
-    ProblemSubmitLanguageEnum(String text, String value) {
+    private final Set<String> aliases;
+
+    ProblemSubmitLanguageEnum(String text, String value, Set<String> aliases) {
         this.text = text;
         this.value = value;
+        this.aliases = aliases;
     }
 
-    /**
-     * 获取值列表
-     *
-     * @return
-     */
     public static List<String> getValues() {
-        return Arrays.stream(values()).map(item -> item.value).collect(Collectors.toList());
+        return Arrays.stream(values()).map(ProblemSubmitLanguageEnum::getValue).collect(Collectors.toList());
     }
 
-    /**
-     * 根据 value 获取枚举
-     *
-     * @param value
-     * @return
-     */
     public static ProblemSubmitLanguageEnum getEnumByValue(String value) {
         if (ObjectUtils.isEmpty(value)) {
             return null;
         }
-        for (ProblemSubmitLanguageEnum anEnum : ProblemSubmitLanguageEnum.values()) {
-            if (anEnum.value.equals(value)) {
-                return anEnum;
+        String normalizedValue = normalize(value);
+        for (ProblemSubmitLanguageEnum languageEnum : ProblemSubmitLanguageEnum.values()) {
+            if (languageEnum.value.equals(normalizedValue) || languageEnum.aliases.contains(normalizedValue)) {
+                return languageEnum;
             }
         }
         return null;
+    }
+
+    public static String normalizeValue(String value) {
+        ProblemSubmitLanguageEnum languageEnum = getEnumByValue(value);
+        return languageEnum == null ? null : languageEnum.getValue();
+    }
+
+    private static String normalize(String value) {
+        return value.trim().toLowerCase(Locale.ROOT);
     }
 
     public String getValue() {

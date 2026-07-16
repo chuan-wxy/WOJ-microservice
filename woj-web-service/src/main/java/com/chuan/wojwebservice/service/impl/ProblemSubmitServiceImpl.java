@@ -104,7 +104,7 @@ public class ProblemSubmitServiceImpl extends ServiceImpl<ProblemSubmitMapper, P
         ProblemSubmit problemSubmit = new ProblemSubmit();
         problemSubmit.setPid(pid);
         problemSubmit.setCode(code);
-        problemSubmit.setLanguage(language);
+        problemSubmit.setLanguage(languageEnum.getValue());
         problemSubmit.setUid(user.getId());
         problemSubmit.setState(ProblemSubmitStateEnum.PENDING.getCode());
 
