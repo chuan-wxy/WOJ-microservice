@@ -67,3 +67,11 @@ path:
     course-avatar-path: "${storage.base-path}\\\\avatar\\course"
     activity-avatar-path: "${storage.base-path}\\\\avatar\\activity"
 
+sandbox:
+  runner: local
+  isolate:
+    executable: isolate
+    box-id: 0
+    cg: true
+    path-env: /usr/bin:/bin
+    default-memory-limit-kb: 262144

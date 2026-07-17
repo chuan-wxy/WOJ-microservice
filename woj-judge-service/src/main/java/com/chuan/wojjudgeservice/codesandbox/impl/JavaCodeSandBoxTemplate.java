@@ -4,25 +4,27 @@ import cn.hutool.dfa.FoundWord;
 import cn.hutool.dfa.WordTree;
 import com.chuan.wojcommon.constant.ProblemSubmitResult;
 import com.chuan.wojcommon.exception.StatusSystemErrorException;
-import com.chuan.wojcommon.utils.ProcessUtils;
 import com.chuan.wojjudgeservice.codesandbox.CodeSandbox;
 import com.chuan.wojjudgeservice.codesandbox.CommonCodeSandboxTemplate;
+import com.chuan.wojjudgeservice.codesandbox.runner.SandboxRunRequest;
+import com.chuan.wojjudgeservice.codesandbox.runner.SandboxRunResult;
+import com.chuan.wojjudgeservice.codesandbox.runner.SandboxRunner;
+import com.chuan.wojjudgeservice.codesandbox.runner.SandboxRunnerFactory;
 import com.chuan.wojmodel.pojo.ExecuteMessage;
 import com.chuan.wojmodel.pojo.codesandbox.ExecuteCodeRequest;
 import com.chuan.wojmodel.pojo.codesandbox.ExecuteCodeResponse;
 import com.chuan.wojmodel.pojo.entity.Problem;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -56,6 +58,9 @@ public abstract class JavaCodeSandBoxTemplate extends CommonCodeSandboxTemplate 
     @Value("${path.code.submit-code-path}")
     private String submitCodePath;
 
+    @Autowired
+    private SandboxRunnerFactory sandboxRunnerFactory;
+
     private static String staticJudgeCasePath;
 
     private static String staticSubmitCodePath;
@@ -68,7 +73,7 @@ public abstract class JavaCodeSandBoxTemplate extends CommonCodeSandboxTemplate 
 
     @Override
     public ExecuteCodeResponse executeCode(ExecuteCodeRequest executeCodeRequest, Problem problem) throws IOException,
-            StatusSystemErrorException {
+            InterruptedException, StatusSystemErrorException {
         long needTime = problem.getTimeLimit();
         String questionId = problem.getProblemId();
         String code = executeCodeRequest.getCode();
@@ -83,12 +88,12 @@ public abstract class JavaCodeSandBoxTemplate extends CommonCodeSandboxTemplate 
         String path = parentPath + File.separator + JAVA_FILE_NAME;
         File userCodeFile = saveCodeToFile(code, parentPath, JAVA_FILE_NAME);
 
-        ExecuteMessage executeMessage = compileFile(parentPath, path);
+        ExecuteMessage executeMessage = compileFile(parentPath, path, problem);
         if (executeMessage.getExitValue() != 0) {
             return new ExecuteCodeResponse(ProblemSubmitResult.CE, executeMessage.getInfo(), null, null, null, null);
         }
 
-        ExecuteCodeResponse executeCodeResponse = runFile(parentPath, questionId, needTime);
+        ExecuteCodeResponse executeCodeResponse = runFile(parentPath, questionId, needTime, problem);
 
 //        boolean deleted = deleteFile(userCodeFile);
 //        if (!deleted) {
@@ -98,23 +103,26 @@ public abstract class JavaCodeSandBoxTemplate extends CommonCodeSandboxTemplate 
         return executeCodeResponse;
     }
 
-    public ExecuteMessage compileFile(String parentPath, String path) {
-        File file = new File(path);
-
+    public ExecuteMessage compileFile(String parentPath, String path, Problem problem) {
         try {
-            List<String> cmd = new ArrayList<>();
-            cmd.add("javac");
-            cmd.add("-encoding");
-            cmd.add("UTF-8");
-            cmd.add(file.getName());
+            SandboxRunner runner = sandboxRunnerFactory.getRunner();
+            SandboxRunResult result = runner.run(SandboxRunRequest.builder()
+                    .command(List.of("javac", "-encoding", "UTF-8", JAVA_FILE_NAME))
+                    .isolateCommand(List.of("/usr/bin/javac", "-encoding", "UTF-8", "/box/" + JAVA_FILE_NAME))
+                    .workDir(parentPath)
+                    .metaFileName("compile.meta")
+                    .timeLimitMillis(5000)
+                    .wallTimeLimitMillis(10000)
+                    .memoryLimitKb(resolveMemoryLimit(problem))
+                    .processLimit(20)
+                    .redirectErrorStream(true)
+                    .compilerEnv(true)
+                    .build());
 
-            ProcessBuilder pb = new ProcessBuilder(cmd);
-            pb.directory(new File(parentPath));
-            pb.redirectErrorStream(true);
-
-            Process compileProcess = pb.start();
-            ExecuteMessage executeMessage = ProcessUtils.runProcessAndGetMessage(compileProcess, "Java compile");
-            if (executeMessage.getExitValue() != 0) {
+            ExecuteMessage executeMessage = new ExecuteMessage();
+            executeMessage.setExitValue(result.getExitCode());
+            executeMessage.setInfo(result.getOutput());
+            if (result.getExitCode() != 0) {
                 executeMessage.setExitValue(1);
                 executeMessage.setResult(ProblemSubmitResult.CE);
             }
@@ -127,9 +135,11 @@ public abstract class JavaCodeSandBoxTemplate extends CommonCodeSandboxTemplate 
         }
     }
 
-    public ExecuteCodeResponse runFile(String parentPath, String questionId, long needTime) throws IOException, StatusSystemErrorException {
+    public ExecuteCodeResponse runFile(String parentPath, String questionId, long needTime, Problem problem)
+            throws IOException, InterruptedException, StatusSystemErrorException {
         ExecuteCodeResponse executeCodeResponse = new ExecuteCodeResponse();
-        List<Long> timeList = new ArrayList<>();
+        List<Long> timeList = new java.util.ArrayList<>();
+        List<Long> memoryList = new java.util.ArrayList<>();
 
         File judgeCaseDir = new File(staticJudgeCasePath + File.separator + questionId);
         if (!judgeCaseDir.exists() || !judgeCaseDir.isDirectory()) {
@@ -141,11 +151,7 @@ public abstract class JavaCodeSandBoxTemplate extends CommonCodeSandboxTemplate 
             throw new StatusSystemErrorException("测试用例不存在");
         }
 
-        Arrays.sort(inputFiles, (f1, f2) -> {
-            int n1 = extractNumber(f1.getName());
-            int n2 = extractNumber(f2.getName());
-            return Integer.compare(n1, n2);
-        });
+        Arrays.sort(inputFiles, (f1, f2) -> Integer.compare(extractNumber(f1.getName()), extractNumber(f2.getName())));
 
         for (File inputFile : inputFiles) {
             String inputFileName = inputFile.getName();
@@ -159,50 +165,56 @@ public abstract class JavaCodeSandBoxTemplate extends CommonCodeSandboxTemplate 
                 throw new StatusSystemErrorException("缺少对应的答案文件：" + answerPath);
             }
 
-            ProcessBuilder builder = new ProcessBuilder("java", "-cp", parentPath, JAVA_CLASS_NAME);
-            builder.directory(new File(parentPath));
-            builder.redirectInput(new File(inputPath));
-            builder.redirectOutput(new File(outputPath));
-            builder.redirectErrorStream(true);
+            SandboxRunResult result = sandboxRunnerFactory.getRunner().run(SandboxRunRequest.builder()
+                    .command(List.of("java", "-cp", parentPath, JAVA_CLASS_NAME))
+                    .isolateCommand(List.of("/usr/bin/java", "-cp", "/box", JAVA_CLASS_NAME))
+                    .workDir(parentPath)
+                    .stdinPath(inputPath)
+                    .stdoutPath(outputPath)
+                    .metaFileName(baseName + ".run.meta")
+                    .timeLimitMillis(needTime)
+                    .wallTimeLimitMillis(needTime + 2000)
+                    .memoryLimitKb(resolveMemoryLimit(problem))
+                    .processLimit(20)
+                    .redirectErrorStream(true)
+                    .compilerEnv(false)
+                    .build());
 
-            long startTime = System.nanoTime();
-            Process process = null;
-
-            try {
-                process = builder.start();
-                boolean finished = process.waitFor(needTime, TimeUnit.MILLISECONDS);
-                long duration = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
-
-                if (!finished) {
-                    process.destroyForcibly();
-                    executeCodeResponse.setResult(ProblemSubmitResult.TLE);
-                    return executeCodeResponse;
-                }
-
-                if (process.exitValue() != 0) {
-                    executeCodeResponse.setResult(ProblemSubmitResult.RE);
-                    return executeCodeResponse;
-                }
-
-                if (!compareAnswer(answerPath, outputPath)) {
-                    executeCodeResponse.setResult(ProblemSubmitResult.WA);
-                    return executeCodeResponse;
-                }
-
-                timeList.add(duration);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                throw new StatusSystemErrorException("Java 程序运行被中断");
-            } finally {
-                if (process != null) {
-                    process.destroy();
-                }
+            if (result.isTimedOut()) {
+                log.warn("Java run timeout, input={}, timeLimit={}ms, output={}", inputPath, needTime, result.getOutput());
+                executeCodeResponse.setResult(ProblemSubmitResult.TLE);
+                executeCodeResponse.setInfo(result.getOutput());
+                return executeCodeResponse;
             }
+
+            if (result.getExitCode() != 0) {
+                log.warn("Java runtime error, input={}, exitCode={}, output={}",
+                        inputPath, result.getExitCode(), result.getOutput());
+                executeCodeResponse.setResult(ProblemSubmitResult.RE);
+                executeCodeResponse.setInfo(result.getOutput());
+                return executeCodeResponse;
+            }
+
+            if (!compareAnswer(answerPath, outputPath)) {
+                executeCodeResponse.setResult(ProblemSubmitResult.WA);
+                return executeCodeResponse;
+            }
+
+            timeList.add(result.getTimeMillis());
+            memoryList.add(result.getMemoryKb());
         }
 
         executeCodeResponse.setResult(ProblemSubmitResult.AC);
         executeCodeResponse.setTimeList(timeList);
+        executeCodeResponse.setMemoryList(memoryList);
         return executeCodeResponse;
+    }
+
+    private Long resolveMemoryLimit(Problem problem) {
+        if (problem.getMemoryLimit() == null || problem.getMemoryLimit() <= 0) {
+            return null;
+        }
+        return problem.getMemoryLimit().longValue();
     }
 
     private int extractNumber(String name) {

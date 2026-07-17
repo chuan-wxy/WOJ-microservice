@@ -13,7 +13,7 @@ import java.io.IOException;
 public class CCodeSandBox extends CCodeSandBoxTemplate{
 
     @Override
-    public ExecuteCodeResponse executeCode(ExecuteCodeRequest executeCodeRequest, Problem problem) throws IOException, StatusSystemErrorException {
+    public ExecuteCodeResponse executeCode(ExecuteCodeRequest executeCodeRequest, Problem problem) throws IOException, InterruptedException, StatusSystemErrorException {
         return super.executeCode(executeCodeRequest,problem);
     }
 }

@@ -92,3 +92,11 @@ path:
     course-avatar-path: ${course-avatar-path}
     activity-avatar-path: ${activity-avatar-path}
 
+sandbox:
+  runner: ${SANDBOX_RUNNER:isolate}
+  isolate:
+    executable: ${ISOLATE_EXECUTABLE:isolate}
+    box-id: ${ISOLATE_BOX_ID:0}
+    cg: ${ISOLATE_CG:true}
+    path-env: ${ISOLATE_PATH_ENV:/usr/bin:/bin}
+    default-memory-limit-kb: ${ISOLATE_DEFAULT_MEMORY_LIMIT_KB:262144}

@@ -10,8 +10,6 @@ import com.chuan.wojmodel.pojo.entity.Problem;
 import com.chuan.wojmodel.pojo.entity.ProblemSubmit;
 import com.chuan.wojmodel.pojo.entity.User;
 import com.chuan.wojmodel.pojo.vo.problemSubmit.ProblemSubmitVO;
-import com.chuan.wojserviceclient.service.AiFeignClient;
-import com.chuan.wojserviceclient.service.AiStreamFeignClient;
 import com.chuan.wojserviceclient.service.UserFeignClient;
 import com.chuan.wojwebservice.mapper.ProblemMapper;
 import com.chuan.wojwebservice.mapper.ProblemSubmitMapper;
@@ -52,9 +50,6 @@ public class ProblemSubmitController {
 
     @Resource
     UserFeignClient userFeignClient;
-
-    @Resource
-    AiStreamFeignClient aiStreamFeignClient;
 
     @Resource
     ProblemSubmitService problemSubmitService;
@@ -103,35 +98,36 @@ public class ProblemSubmitController {
 
         SseEmitter emitter = new SseEmitter(120000L);
 
-        CompletableFuture.runAsync(() -> {
-            try (feign.Response response = aiStreamFeignClient.triggerAnalysisStream(problemSubmitAiDTO)) {
-                if (response.status() != 200) {
-                    emitter.send(SseEmitter.event().name("error").data("AI服务异常: " + response.reason()));
-                    emitter.complete();
-                    return;
-                }
-
-                try (BufferedReader reader = new BufferedReader(
-                        new InputStreamReader(response.body().asInputStream(), StandardCharsets.UTF_8))) {
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        String trimmed = line.trim();
-                        if (trimmed.isEmpty()) {
-                            continue;
-                        }
-                        if (trimmed.startsWith("data:")) {
-                            String payload = trimmed.substring(5).trim();
-                            if (!payload.isEmpty()) {
-                                emitter.send(SseEmitter.event().data(payload));
-                            }
-                        }
-                    }
-                    emitter.complete();
-                }
-            } catch (Exception e) {
-                emitter.completeWithError(e);
-            }
-        });
+        // todo
+//        CompletableFuture.runAsync(() -> {
+//            try (feign.Response response = aiStreamFeignClient.triggerAnalysisStream(problemSubmitAiDTO)) {
+//                if (response.status() != 200) {
+//                    emitter.send(SseEmitter.event().name("error").data("AI服务异常: " + response.reason()));
+//                    emitter.complete();
+//                    return;
+//                }
+//
+//                try (BufferedReader reader = new BufferedReader(
+//                        new InputStreamReader(response.body().asInputStream(), StandardCharsets.UTF_8))) {
+//                    String line;
+//                    while ((line = reader.readLine()) != null) {
+//                        String trimmed = line.trim();
+//                        if (trimmed.isEmpty()) {
+//                            continue;
+//                        }
+//                        if (trimmed.startsWith("data:")) {
+//                            String payload = trimmed.substring(5).trim();
+//                            if (!payload.isEmpty()) {
+//                                emitter.send(SseEmitter.event().data(payload));
+//                            }
+//                        }
+//                    }
+//                    emitter.complete();
+//                }
+//            } catch (Exception e) {
+//                emitter.completeWithError(e);
+//            }
+//        });
 
         return emitter;
     }

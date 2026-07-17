@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Data
 public class ExecuteMessage {
+    // 标志位，0代表正常
     private Integer exitValue;
 
     private String result;
