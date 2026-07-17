@@ -246,6 +246,7 @@ public class ProblemSubmitServiceImpl extends ServiceImpl<ProblemSubmitMapper, P
         updateRecord.setId(submitId);
         updateRecord.setState(ProblemSubmitStateEnum.ACCEPTED.getCode());
         updateRecord.setJudgeResult(response.getResult());
+        updateRecord.setJudgeInfo(response.getInfo());
         updateRecord.setTimeList(JSONUtil.toJsonStr(response.getTimeList()));
         updateRecord.setMemoryList(JSONUtil.toJsonStr(response.getMemoryList()));
         this.updateById(updateRecord);
