@@ -62,16 +62,13 @@ path:
   code:
     submit-code-path: "${storage.base-path}\\submitcode"
     judgecase-path: "${storage.base-path}\\judgecase"
-  avatar:
-    user-avatar-path: "${storage.base-path}\\avatar\\user"
-    course-avatar-path: "${storage.base-path}\\\\avatar\\course"
-    activity-avatar-path: "${storage.base-path}\\\\avatar\\activity"
 
 sandbox:
-  runner: local
+  runner: isolate
   isolate:
     executable: isolate
-    box-id: 0
     cg: true
+    work-dir: /box
+    source-dir: /box
     path-env: /usr/bin:/bin
     default-memory-limit-kb: 262144

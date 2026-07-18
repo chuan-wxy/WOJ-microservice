@@ -19,6 +19,8 @@ public class LocalSandboxRunner implements SandboxRunner {
 
     @Override
     public SandboxRunResult run(SandboxRunRequest request) throws IOException, InterruptedException {
+        System.out.println(request.toString());
+
         ProcessBuilder processBuilder = new ProcessBuilder(request.getCommand());
         if (request.getWorkDir() != null) {
             processBuilder.directory(new File(request.getWorkDir()));

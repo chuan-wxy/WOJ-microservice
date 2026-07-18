@@ -8,13 +8,13 @@ import com.chuan.wojjudgeservice.codesandbox.CodeSandbox;
 import com.chuan.wojjudgeservice.codesandbox.CommonCodeSandboxTemplate;
 import com.chuan.wojjudgeservice.codesandbox.runner.SandboxRunRequest;
 import com.chuan.wojjudgeservice.codesandbox.runner.SandboxRunResult;
+import com.chuan.wojjudgeservice.codesandbox.runner.IsolateSandboxRunner;
 import com.chuan.wojjudgeservice.codesandbox.runner.SandboxRunner;
 import com.chuan.wojjudgeservice.codesandbox.runner.SandboxRunnerFactory;
 import com.chuan.wojmodel.pojo.ExecuteMessage;
 import com.chuan.wojmodel.pojo.codesandbox.ExecuteCodeRequest;
 import com.chuan.wojmodel.pojo.codesandbox.ExecuteCodeResponse;
 import com.chuan.wojmodel.pojo.entity.Problem;
-import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -55,16 +55,6 @@ public abstract class CCodeSandBoxTemplate extends CommonCodeSandboxTemplate imp
     @Autowired
     private SandboxRunnerFactory sandboxRunnerFactory;
 
-    private static String staticJudgeCasePath;
-
-    private static String staticSubmitCodePath;
-
-    @PostConstruct
-    public void init() {
-        staticJudgeCasePath = judgeCasePath;
-        staticSubmitCodePath = submitCodePath;
-    }
-
     @Override
     public ExecuteCodeResponse executeCode(ExecuteCodeRequest executeCodeRequest, Problem problem) throws IOException,
             InterruptedException, StatusSystemErrorException {
@@ -78,11 +68,11 @@ public abstract class CCodeSandBoxTemplate extends CommonCodeSandboxTemplate imp
         }
 
         String uuid = java.util.UUID.randomUUID().toString();
-        String parentPath = staticSubmitCodePath + File.separator + uuid;
+        String parentPath = submitCodePath + File.separator + uuid;
         String path = parentPath + File.separator + CPP_FILE_NAME;
         File userCodeFile = saveCodeToFile(code, parentPath, CPP_FILE_NAME);
 
-        ExecuteMessage executeMessage = compileFile(parentPath, path, problem);
+        ExecuteMessage executeMessage = compileFile(parentPath, userCodeFile.getAbsolutePath(), problem);
 
         if (executeMessage.getExitValue() != 0) {
             return new ExecuteCodeResponse(ProblemSubmitResult.CE, executeMessage.getInfo(), null, null, null, null);
@@ -98,7 +88,7 @@ public abstract class CCodeSandBoxTemplate extends CommonCodeSandboxTemplate imp
         return executeCodeResponse;
     }
 
-    public ExecuteMessage compileFile(String parentPath, String path, Problem problem) {
+    public ExecuteMessage compileFile(String parentPath, String sourcePath, Problem problem) {
         try {
             SandboxRunner runner = sandboxRunnerFactory.getRunner();
             String executableName = getLocalExecutableName();
@@ -107,8 +97,8 @@ public abstract class CCodeSandBoxTemplate extends CommonCodeSandboxTemplate imp
                     .isolateCommand(List.of("/usr/bin/g++", "/box/" + CPP_FILE_NAME, "-std=c++17", "-O2", "-o", "/box/" + CPP_EXECUTABLE_NAME))
                     .workDir(parentPath)
                     .metaFileName("compile.meta")
-                    .timeLimitMillis(5000)
-                    .wallTimeLimitMillis(10000)
+                    .timeLimitMillis(10000)
+                    .wallTimeLimitMillis(20000)
                     .memoryLimitKb(resolveMemoryLimit(problem))
                     .processLimit(20)
                     .redirectErrorStream(true)
@@ -137,7 +127,7 @@ public abstract class CCodeSandBoxTemplate extends CommonCodeSandboxTemplate imp
         List<Long> timeList = new java.util.ArrayList<>();
         List<Long> memoryList = new java.util.ArrayList<>();
 
-        File judgeCaseDir = new File(staticJudgeCasePath + File.separator + questionId);
+        File judgeCaseDir = new File(judgeCasePath + File.separator + questionId);
         if (!judgeCaseDir.exists() || !judgeCaseDir.isDirectory()) {
             throw new StatusSystemErrorException("测试用例不存在");
         }
@@ -213,10 +203,14 @@ public abstract class CCodeSandBoxTemplate extends CommonCodeSandboxTemplate imp
         return problem.getMemoryLimit().longValue();
     }
 
+    /**
+     * 根据系统类型，返回可执行文件名
+     * @return
+     */
     private String getLocalExecutableName() {
         return System.getProperty("os.name").toLowerCase().contains("win")
                 ? CPP_EXECUTABLE_NAME + ".exe"
-                : CPP_EXECUTABLE_NAME;
+                : CPP_EXECUTABLE_NAME + ".out";
     }
 
     private int extractNumber(String name) {

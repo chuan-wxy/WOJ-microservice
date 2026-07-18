@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.zip.CRC32;
 
 @Component
 public class IsolateSandboxRunner implements SandboxRunner {
@@ -27,10 +28,14 @@ public class IsolateSandboxRunner implements SandboxRunner {
 
     @Override
     public SandboxRunResult run(SandboxRunRequest request) throws IOException, InterruptedException {
-        initBox();
+        int boxId = resolveBoxId(request.getWorkDir());
+        System.out.println(boxId);
+        initBox(boxId);
         try {
+            System.out.println(2);
             Path metaPath = Path.of(request.getWorkDir(), request.getMetaFileName() == null ? "isolate.meta" : request.getMetaFileName());
-            List<String> command = buildRunCommand(request, metaPath);
+            System.out.println(metaPath);
+            List<String> command = buildRunCommand(request, metaPath, boxId);
 
             long startTime = System.nanoTime();
             Process process = new ProcessBuilder(command)
@@ -50,12 +55,12 @@ public class IsolateSandboxRunner implements SandboxRunner {
                     .meta(meta)
                     .build();
         } finally {
-            cleanupBox();
+            cleanupBox(boxId);
         }
     }
 
-    private List<String> buildRunCommand(SandboxRunRequest request, Path metaPath) {
-        List<String> command = baseCommand();
+    private List<String> buildRunCommand(SandboxRunRequest request, Path metaPath, int boxId) {
+        List<String> command = baseCommand(boxId);
         command.add("--run");
         command.add("--wait");
         command.add("--dir=/box=" + request.getWorkDir() + ":rw");
@@ -96,31 +101,41 @@ public class IsolateSandboxRunner implements SandboxRunner {
         return command;
     }
 
-    private void initBox() throws IOException, InterruptedException {
-        runControlCommand("--init");
+    private void initBox(int boxId) throws IOException, InterruptedException {
+        runControlCommand("--init", boxId);
     }
 
-    private void cleanupBox() throws IOException, InterruptedException {
-        runControlCommand("--cleanup");
+    private void cleanupBox(int boxId) throws IOException, InterruptedException {
+        runControlCommand("--cleanup", boxId);
     }
 
-    private void runControlCommand(String action) throws IOException, InterruptedException {
-        List<String> command = baseCommand();
+    private void runControlCommand(String action, int boxId) throws IOException, InterruptedException {
+        List<String> command = baseCommand(boxId);
         command.add(action);
+
+        System.out.println(command);
         Process process = new ProcessBuilder(command)
                 .redirectErrorStream(true)
                 .start();
         process.waitFor();
     }
 
-    private List<String> baseCommand() {
+    private List<String> baseCommand(int boxId) {
         List<String> command = new ArrayList<>();
         command.add(properties.getIsolate().getExecutable());
         if (properties.getIsolate().isCg()) {
             command.add("--cg");
         }
-        command.add("--box-id=" + properties.getIsolate().getBoxId());
+        command.add("--box-id=" + boxId);
         return command;
+    }
+
+    // todo 优化映射关系，解决冲突
+    private int resolveBoxId(String workDir) {
+        String normalizedWorkDir = Path.of(workDir).toAbsolutePath().normalize().toString();
+        CRC32 crc32 = new CRC32();
+        crc32.update(normalizedWorkDir.getBytes(StandardCharsets.UTF_8));
+        return (int) (crc32.getValue() % 10000);
     }
 
     private String toBoxPath(String workDir, String path) {

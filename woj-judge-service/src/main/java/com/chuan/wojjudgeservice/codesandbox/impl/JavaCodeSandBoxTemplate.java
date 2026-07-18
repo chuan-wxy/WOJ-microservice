@@ -14,7 +14,6 @@ import com.chuan.wojmodel.pojo.ExecuteMessage;
 import com.chuan.wojmodel.pojo.codesandbox.ExecuteCodeRequest;
 import com.chuan.wojmodel.pojo.codesandbox.ExecuteCodeResponse;
 import com.chuan.wojmodel.pojo.entity.Problem;
-import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -61,16 +60,6 @@ public abstract class JavaCodeSandBoxTemplate extends CommonCodeSandboxTemplate 
     @Autowired
     private SandboxRunnerFactory sandboxRunnerFactory;
 
-    private static String staticJudgeCasePath;
-
-    private static String staticSubmitCodePath;
-
-    @PostConstruct
-    public void init() {
-        staticJudgeCasePath = judgeCasePath;
-        staticSubmitCodePath = submitCodePath;
-    }
-
     @Override
     public ExecuteCodeResponse executeCode(ExecuteCodeRequest executeCodeRequest, Problem problem) throws IOException,
             InterruptedException, StatusSystemErrorException {
@@ -84,7 +73,7 @@ public abstract class JavaCodeSandBoxTemplate extends CommonCodeSandboxTemplate 
         }
 
         String uuid = java.util.UUID.randomUUID().toString();
-        String parentPath = staticSubmitCodePath + File.separator + uuid;
+        String parentPath = submitCodePath + File.separator + uuid;
         String path = parentPath + File.separator + JAVA_FILE_NAME;
         File userCodeFile = saveCodeToFile(code, parentPath, JAVA_FILE_NAME);
 
@@ -141,7 +130,7 @@ public abstract class JavaCodeSandBoxTemplate extends CommonCodeSandboxTemplate 
         List<Long> timeList = new java.util.ArrayList<>();
         List<Long> memoryList = new java.util.ArrayList<>();
 
-        File judgeCaseDir = new File(staticJudgeCasePath + File.separator + questionId);
+        File judgeCaseDir = new File(judgeCasePath + File.separator + questionId);
         if (!judgeCaseDir.exists() || !judgeCaseDir.isDirectory()) {
             throw new StatusSystemErrorException("测试用例不存在");
         }

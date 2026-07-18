@@ -32,7 +32,7 @@
         <dependency>
             <groupId>com.chuan</groupId>
             <artifactId>woj-common</artifactId>
-            <version>${version}</version>
+            <version>${revision}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

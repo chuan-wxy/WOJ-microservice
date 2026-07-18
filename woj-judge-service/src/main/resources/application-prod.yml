@@ -11,13 +11,13 @@ mysql-password: ${MYSQL_PASSWORD:123456}
 
 ssl-key-store-type: ${SSL_KEY_STORE_TYPE:jks}
 ssl-key-password: ${SSL_KEY_PASSWORD:21q06e25}
-ssl-key-store-path: ${SSL_KEY_STORE_PATH:/home/serve/resource/woj.asia.jks}
+ssl-key-store-path: ${SSL_KEY_STORE_PATH:/home/woj/resource/woj.asia.jks}
 
 # 日志输出目录
-logging-file-path: ${LOGGING_FILE_PATH:/home/serve/woj.log}
+logging-file-path: ${LOGGING_FILE_PATH:/home/woj/woj.log}
 
-submit-code-path: ${SUBMIT_CODE_PATH:/home/serve/submitcode}
-judgecase-path: ${JUDGECASE_PATH:/home/serve/judgecase}
+submit-code-path: ${SUBMIT_CODE_PATH:/home/woj/submitcode}
+judgecase-path: ${JUDGECASE_PATH:/home/woj/judgecase}
 # 图像
 user-avatar-path: ${USER_AVATAR_PATH:/usr/local/nginx/html/avatar/user}
 course-avatar-path: ${COURSE_AVATAR_PATH:/usr/local/nginx/html/avatar/course}
@@ -96,7 +96,8 @@ sandbox:
   runner: ${SANDBOX_RUNNER:isolate}
   isolate:
     executable: ${ISOLATE_EXECUTABLE:isolate}
-    box-id: ${ISOLATE_BOX_ID:0}
     cg: ${ISOLATE_CG:true}
+    work-dir: ${ISOLATE_WORK_DIR:/box}
+    source-dir: ${ISOLATE_SOURCE_DIR:/box}
     path-env: ${ISOLATE_PATH_ENV:/usr/bin:/bin}
     default-memory-limit-kb: ${ISOLATE_DEFAULT_MEMORY_LIMIT_KB:262144}

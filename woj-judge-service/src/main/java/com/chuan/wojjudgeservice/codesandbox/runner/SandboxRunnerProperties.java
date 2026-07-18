@@ -21,8 +21,6 @@ public class SandboxRunnerProperties {
 
         private String executable = "isolate";
 
-        private int boxId = 0;
-
         private boolean cg = true;
 
         private String pathEnv = "/usr/bin:/bin";

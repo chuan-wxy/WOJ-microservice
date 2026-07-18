@@ -59,13 +59,5 @@ logging:
 storage:
   base-path: "D:\\woj"
 
-path:
-  code:
-    submit-code-path: "${storage.base-path}\\submitcode"
-    judgecase-path: "${storage.base-path}\\judgecase"
-  avatar:
-    user-avatar-path: "${storage.base-path}\\avatar\\user"
-    course-avatar-path: "${storage.base-path}\\\\avatar\\course"
-    activity-avatar-path: "${storage.base-path}\\\\avatar\\activity"
 
 
