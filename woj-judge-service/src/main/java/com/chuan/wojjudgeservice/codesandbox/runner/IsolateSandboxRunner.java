@@ -29,12 +29,9 @@ public class IsolateSandboxRunner implements SandboxRunner {
     @Override
     public SandboxRunResult run(SandboxRunRequest request) throws IOException, InterruptedException {
         int boxId = resolveBoxId(request.getWorkDir());
-        System.out.println(boxId);
         initBox(boxId);
         try {
-            System.out.println(2);
             Path metaPath = Path.of(request.getWorkDir(), request.getMetaFileName() == null ? "isolate.meta" : request.getMetaFileName());
-            System.out.println(metaPath);
             List<String> command = buildRunCommand(request, metaPath, boxId);
 
             long startTime = System.nanoTime();
@@ -63,17 +60,15 @@ public class IsolateSandboxRunner implements SandboxRunner {
         List<String> command = baseCommand(boxId);
         command.add("--run");
         command.add("--wait");
-        command.add("--dir=/box=" + request.getWorkDir() + ":rw");
+        command.add("--dir=/work=" + request.getWorkDir() + ":rw");
         if (request.isCompilerEnv()) {
             command.add("--dir=/usr");
-            command.add("--dir=/bin");
-            command.add("--dir=/lib");
-            command.add("--dir=/lib64:maybe");
             command.add("--env=PATH=" + properties.getIsolate().getPathEnv());
         } else {
             command.add("--dir=/lib");
             command.add("--dir=/lib64:maybe");
             command.add("--dir=/usr/lib");
+            command.add("--dir=/woj:rw");
             command.add("--env=PATH=" + properties.getIsolate().getPathEnv());
         }
         command.add("--meta=" + metaPath);
@@ -86,15 +81,15 @@ public class IsolateSandboxRunner implements SandboxRunner {
                 ? properties.getIsolate().getDefaultMemoryLimitKb()
                 : request.getMemoryLimitKb()));
         if (request.getStdinPath() != null) {
-            command.add("--stdin=" + toBoxPath(request.getWorkDir(), request.getStdinPath()));
+            command.add("--stdin=" + request.getStdinPath());
         }
         if (request.getStdoutPath() != null) {
-            command.add("--stdout=" + toBoxPath(request.getWorkDir(), request.getStdoutPath()));
+            command.add("--stdout=" + request.getStdoutPath());
         }
         if (request.isRedirectErrorStream()) {
             command.add("--stderr-to-stdout");
         } else if (request.getStderrPath() != null) {
-            command.add("--stderr=" + toBoxPath(request.getWorkDir(), request.getStderrPath()));
+            command.add("--stderr=" + request.getStderrPath());
         }
         command.add("--");
         command.addAll(request.getIsolateCommand() == null ? request.getCommand() : request.getIsolateCommand());
@@ -112,8 +107,6 @@ public class IsolateSandboxRunner implements SandboxRunner {
     private void runControlCommand(String action, int boxId) throws IOException, InterruptedException {
         List<String> command = baseCommand(boxId);
         command.add(action);
-
-        System.out.println(command);
         Process process = new ProcessBuilder(command)
                 .redirectErrorStream(true)
                 .start();
@@ -138,14 +131,6 @@ public class IsolateSandboxRunner implements SandboxRunner {
         return (int) (crc32.getValue() % 10000);
     }
 
-    private String toBoxPath(String workDir, String path) {
-        Path workPath = Path.of(workDir).toAbsolutePath().normalize();
-        Path targetPath = Path.of(path).toAbsolutePath().normalize();
-        if (targetPath.startsWith(workPath)) {
-            return "/box/" + workPath.relativize(targetPath).toString().replace(File.separatorChar, '/');
-        }
-        return path;
-    }
 
     private String toSeconds(long millis) {
         if (millis <= 0) {

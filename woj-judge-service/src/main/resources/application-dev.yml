@@ -56,19 +56,18 @@ logging:
 
 # 定义公共前缀
 storage:
-  base-path: "D:\\woj"
+  # base-path: "/woj/"
+  base-path: "D:\\woj\\"
 
 path:
   code:
-    submit-code-path: "${storage.base-path}\\submitcode"
-    judgecase-path: "${storage.base-path}\\judgecase"
+    submit-code-path: "${storage.base-path}submitcode"
+    judgecase-path: "${storage.base-path}judgecase"
 
 sandbox:
   runner: isolate
   isolate:
     executable: isolate
     cg: true
-    work-dir: /box
-    source-dir: /box
     path-env: /usr/bin:/bin
     default-memory-limit-kb: 262144

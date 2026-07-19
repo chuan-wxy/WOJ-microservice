@@ -97,7 +97,7 @@ public abstract class JavaCodeSandBoxTemplate extends CommonCodeSandboxTemplate 
             SandboxRunner runner = sandboxRunnerFactory.getRunner();
             SandboxRunResult result = runner.run(SandboxRunRequest.builder()
                     .command(List.of("javac", "-encoding", "UTF-8", JAVA_FILE_NAME))
-                    .isolateCommand(List.of("/usr/bin/javac", "-encoding", "UTF-8", "/box/" + JAVA_FILE_NAME))
+                    .isolateCommand(List.of("/usr/bin/javac", "-encoding", "UTF-8", "/work/" + JAVA_FILE_NAME))
                     .workDir(parentPath)
                     .metaFileName("compile.meta")
                     .timeLimitMillis(5000)
@@ -156,7 +156,7 @@ public abstract class JavaCodeSandBoxTemplate extends CommonCodeSandboxTemplate 
 
             SandboxRunResult result = sandboxRunnerFactory.getRunner().run(SandboxRunRequest.builder()
                     .command(List.of("java", "-cp", parentPath, JAVA_CLASS_NAME))
-                    .isolateCommand(List.of("/usr/bin/java", "-cp", "/box", JAVA_CLASS_NAME))
+                    .isolateCommand(List.of("/usr/bin/java", "-cp", "/work", JAVA_CLASS_NAME))
                     .workDir(parentPath)
                     .stdinPath(inputPath)
                     .stdoutPath(outputPath)

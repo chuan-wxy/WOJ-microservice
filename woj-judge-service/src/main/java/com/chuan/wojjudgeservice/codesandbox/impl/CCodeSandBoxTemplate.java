@@ -94,12 +94,12 @@ public abstract class CCodeSandBoxTemplate extends CommonCodeSandboxTemplate imp
             String executableName = getLocalExecutableName();
             SandboxRunResult result = runner.run(SandboxRunRequest.builder()
                     .command(List.of("g++", "-std=c++17", "-O2", "-static", "-static-libgcc", "-static-libstdc++", "-o", executableName, CPP_FILE_NAME))
-                    .isolateCommand(List.of("/usr/bin/g++", "/box/" + CPP_FILE_NAME, "-std=c++17", "-O2", "-o", "/box/" + CPP_EXECUTABLE_NAME))
+                    .isolateCommand(List.of("/usr/bin/g++", "/work/" + CPP_FILE_NAME, "-std=c++17", "-O2", "-o", "/work/" + getLocalExecutableName()))
                     .workDir(parentPath)
                     .metaFileName("compile.meta")
                     .timeLimitMillis(10000)
                     .wallTimeLimitMillis(20000)
-                    .memoryLimitKb(resolveMemoryLimit(problem))
+                    .memoryLimitKb((long)524288)
                     .processLimit(20)
                     .redirectErrorStream(true)
                     .compilerEnv(true)
@@ -153,7 +153,7 @@ public abstract class CCodeSandBoxTemplate extends CommonCodeSandboxTemplate imp
 
             SandboxRunResult result = sandboxRunnerFactory.getRunner().run(SandboxRunRequest.builder()
                     .command(List.of(parentPath + File.separator + getLocalExecutableName()))
-                    .isolateCommand(List.of("/box/" + CPP_EXECUTABLE_NAME))
+                    .isolateCommand(List.of("/work/" + getLocalExecutableName()))
                     .workDir(parentPath)
                     .stdinPath(inputPath)
                     .stdoutPath(outputPath)
